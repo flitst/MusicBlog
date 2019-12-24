@@ -1,15 +1,14 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.io.File"%>
 <%@ page import="com.explorer.musicblog.filter.WebsiteStatisticFilter"%>
 <%@ page import="com.explorer.musicblog.listener.OnlineNumberListener" %>
 <%@ page import="com.explorer.musicblog.servlet.CounterServlet" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 	<head>
 		<!-- <meta  http-equiv="refresh"  content="15">  -->
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		
 		<title>音乐盒子</title>
 		<style type="text/css">
 			body{

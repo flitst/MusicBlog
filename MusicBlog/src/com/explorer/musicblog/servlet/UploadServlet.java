@@ -18,20 +18,28 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.explorer.musicblog.pojo.Song;
 
 /**
- * Servlet implementation class UploadServlet
+ * 	上传文件Servlet
  */
 @WebServlet("/UploadServlet.do")
 public class UploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-	 // 上传文件存储目录
-    private static final String UPLOAD_DIRECTORY = "upload";
- 
     // 上传配置
-    private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 10;  	// 10MB
-    private static final int MAX_FILE_SIZE      = 1024 * 1024 * 1000; 	// 1G
-    private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 15; 	// 15MB
+    private static final int MEMORY_THRESHOLD = 1024 * 1024 * 10;  // 10MB
+    private static final int MAX_FILE_SIZE 	  = 1024 * 1024 * 1000;// 1GB
+    private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 15;  // 15MB
 
+    // 上传文件存储目录
+    private final String UPLOAD_DIRECTORY;
+
+    public UploadServlet(){
+    	this.UPLOAD_DIRECTORY = "upload";
+    }
+    
+    public UploadServlet(String directory){
+    	this.UPLOAD_DIRECTORY = "upload\\" + directory;
+    }
+    
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// 检测是否为多媒体上传

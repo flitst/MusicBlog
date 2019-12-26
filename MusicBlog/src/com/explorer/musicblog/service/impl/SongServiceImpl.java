@@ -3,7 +3,7 @@ package com.explorer.musicblog.service.impl;
 import java.util.List;
 
 import com.explorer.musicblog.dao.ISongDao;
-import com.explorer.musicblog.dao.impl.SongDaoImpl;
+import com.explorer.musicblog.dao.impl.DaoFactory;
 import com.explorer.musicblog.pojo.Song;
 import com.explorer.musicblog.service.ISongService;
 
@@ -13,7 +13,7 @@ import com.explorer.musicblog.service.ISongService;
  */
 public class SongServiceImpl implements ISongService{
 
-	ISongDao iSongDao = new SongDaoImpl();
+	ISongDao iSongDao = DaoFactory.getSongDao();
 
 	@Override
 	public Integer insert(Song song) {

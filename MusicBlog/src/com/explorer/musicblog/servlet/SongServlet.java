@@ -33,7 +33,7 @@ public class SongServlet extends HttpServlet {
 		}
 	}
 
-	private void addSong(ISongService sf,HttpServletRequest req, HttpServletResponse res) {
+	private void addSong(ISongService sf,HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		String name = req.getParameter("name");
 		String singer = req.getParameter("singer");
 		String lyric = req.getParameter("lyric");
@@ -64,7 +64,13 @@ public class SongServlet extends HttpServlet {
 			s.setType(t);
 			s.setLength(length);
 			System.out.println("song:"+s);
-//			sf.insert(s);
+			UploadServlet us = new UploadServlet(s.getName());
+			us.doGet(req, res);
+			sf.insert(s);
 		}
+	}
+	
+	private void updeteSong(ISongService sf,HttpServletRequest req, HttpServletResponse res) {
+		
 	}
 }

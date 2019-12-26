@@ -105,7 +105,9 @@
 	<div id="top">
 		<div id="search">
 			<input class="text" type="text" placeholder="搜索歌曲"/>
-			<p class="button">搜索</p>
+			<form action="" method="post">
+				<p class="button">搜索</p>
+			</form>
 		</div>
 		<div id="header">
 			<%

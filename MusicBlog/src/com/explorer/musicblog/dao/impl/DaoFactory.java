@@ -2,6 +2,7 @@ package com.explorer.musicblog.dao.impl;
 
 import com.explorer.musicblog.dao.ILyricDao;
 import com.explorer.musicblog.dao.ISingerDao;
+import com.explorer.musicblog.dao.ISongDao;
 import com.explorer.musicblog.dao.ITypeDao;
 import com.explorer.musicblog.dao.IUserDao;
 
@@ -19,6 +20,9 @@ public class DaoFactory {
 	}
 	public static ISingerDao getSingerDao() {
 		return new SingerDaoImpl();
+	}
+	public static ISongDao getSongDao() {
+		return new SongDaoImpl();
 	}
 	public static ILyricDao getLyricDao() {
 		return new LyricDaoImpl();

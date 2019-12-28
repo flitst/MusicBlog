@@ -21,7 +21,7 @@ public class DBUtil {
 	public static ResultSet rs = null;
 
 	// 获取数据库连接
-	public Connection getConn() throws CustomException {
+	public Connection getConn(){
 		try {
 			// 获取配置文件
 			InputStream in = getClass().getResourceAsStream("./driver.properties");
@@ -44,13 +44,16 @@ public class DBUtil {
 			Class.forName(driver);
 			// 用驱动管理器获取数据库连接
 			conn = DriverManager.getConnection(url, user, password);
-		} catch (IOException e) {
-			throw new CustomException("获取配置文件错误!" + e.getMessage());
-		} catch (SQLException e) {
-			throw new CustomException("获取数据库连接失败!" + e.getMessage());
-		} catch (ClassNotFoundException e) {
-			throw new CustomException("类加载错误!" + e.getMessage());
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
+//		catch (IOException e) {
+//			throw new CustomException("获取配置文件错误!" + e.getMessage());
+//		} catch (SQLException e) {
+//			throw new CustomException("获取数据库连接失败!" + e.getMessage());
+//		} catch (ClassNotFoundException e) {
+//			throw new CustomException("类加载错误!" + e.getMessage());
+//		}
 		return conn;
 	}
 

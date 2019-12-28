@@ -30,7 +30,7 @@ public class SingerDaoImpl implements ISingerDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
@@ -60,7 +60,7 @@ public class SingerDaoImpl implements ISingerDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
@@ -84,7 +84,7 @@ public class SingerDaoImpl implements ISingerDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
@@ -115,7 +115,7 @@ public class SingerDaoImpl implements ISingerDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
@@ -156,7 +156,7 @@ public class SingerDaoImpl implements ISingerDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
@@ -192,7 +192,7 @@ public class SingerDaoImpl implements ISingerDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);

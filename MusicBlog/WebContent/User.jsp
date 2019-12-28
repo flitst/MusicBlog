@@ -87,6 +87,9 @@
 			<a href="UserServlet.do?logout">注销</a>
 		</div>
 		<hr/>
-		<input type="file" formaction="miltper-data"/>
+		<form action="UploadServlet.do" method="post">
+			<input type="file" formaction="miltper-data"/>
+			<input type="submit" value="上传歌曲" />
+		</form>
 	</body>
 </html>

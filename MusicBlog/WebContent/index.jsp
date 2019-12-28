@@ -1,8 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.io.File"%>
 <%@ page import="com.explorer.musicblog.filter.WebsiteStatisticFilter"%>
 <%@ page import="com.explorer.musicblog.listener.OnlineNumberListener" %>
 <%@ page import="com.explorer.musicblog.servlet.CounterServlet" %>
+<%@ page import="com.explorer.musicblog.pojo.Song"%>
+<%@ page import="java.util.List"%>
+<%@ page import="java.io.File"%>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -27,7 +29,7 @@
 				height:35px;
 				margin:5px auto;
 			}
-			#search .text{
+			#search form .text{
 				width:100%;
 				height:100%;
 				font-size:20px;
@@ -82,16 +84,16 @@
 				height:70px;
 				list-style:none;
 			}
-			.list img{
+			.list ul li img{
 				width:50px;
 				height:50px;
 				border-radius: 50%;
 			}
-			.list a{
+			.list ul li a{
 				position:relative;
 				left:10px;
 				top:-20px;
-				text-decoration: none;
+				text-decoration:none;
 			}
 			#copyright{
 				width:100%;
@@ -104,9 +106,11 @@
 <body>
 	<div id="top">
 		<div id="search">
-			<input class="text" type="text" placeholder="搜索歌曲"/>
-			<form action="" method="post">
-				<p class="button">搜索</p>
+			<form action="<%=request.getContextPath()%>/SongServlet.do?song=GETBYNAME" method="post">
+				<input class="text" type="text" name="search" placeholder="搜索歌曲"/>
+				<p class="button">
+					<input type="submit" value="搜索" />
+				</p>
 			</form>
 		</div>
 		<div id="header">
@@ -132,57 +136,29 @@
 	</div>
 	<div id="center">
 		<bgsound loop="infinite" src="<%=getServletContext().getContextPath()%>/resources/musics/Candy_Wind - 拂晓车站.flac">
-		<blink inputmode="text">blink</blink>
 		<div id="list">
-			<span id="musics" title='<%=getServletContext().getContextPath()%>/resources/musics/Candy_Wind - 青空.flac'></span>
+		<% List<Song> all = (List)request.getSession().getAttribute("songs");%>
+			<%
+				if(all != null && all.size() > 0){
+			%>
 			<ul>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-32717164.jpg">
-					<a href="#" title="Candy_Wind - 青空.flac">Candy_Wind - 青空.flac</a>
-					<%-- <a href="<%=getServletContext().getContextPath()%>/resources/musics/Candy_Wind - 青空.flac"></a> --%>
+			<%
+				for(int i = 0; i < all.size(); i++){
+			%>
+				<li>
+					<img alt="" style="width:50px;height:50px;border-radius:50%" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-32717164.jpg">
+					<a href="<%=getServletContext().getContextPath()%>/resources/musics/Candy_Wind - 拂晓车站.flac" style="position:relative;left:10px;top:-20px;text-decoration:none">
+						<%=all.get(i).getName()%>
+						<%=all.get(i).getSinger()%>
+					</a>
 				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-32717172.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/Candy_Wind - 拂晓车站.flac">Candy_Wind - 拂晓车站.flac</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-357126.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/Cymophane - Tassel.mp3">Cymophane - Tassel.mp3</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-30953009.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/Alan Walker - Different World.ncm">Alan Walker - Different World.ncm</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-28018075.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/你是我戒不掉的烟.mp3">你是我戒不掉的烟.mp3</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-254574.jpg" width=50 height=50>
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/一个人的夜太孤单.mp3">一个人的夜太孤单.mp3</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-415085696.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/像中枪一样.mp3" title="像中枪一样.mp3">像中枪一样.mp3</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-425570055.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/田馥甄 - 寂寞寂寞就好.mp3">田馥甄 - 寂寞寂寞就好.mp3</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-436487129.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/糖糖乐团 - 你抱着别的女人入睡.mp3">糖糖乐团 - 你抱着别的女人入睡.mp3</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-449818741.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/麦振鸿 - 仙剑奇缘.mp3">麦振鸿 - 仙剑奇缘.mp3</a>
-				</li>
-				<li class="list">
-					<img alt="" src="<%=getServletContext().getContextPath()%>/resources/musics/imgs/offline-478507889.jpg">
-					<a href="<%=getServletContext().getContextPath()%>/resources/musics/黄埔心结,零蛋呀,俗破小五郎 - 剑啸江湖.mp3">黄埔心结,零蛋呀,俗破小五郎 - 剑啸江湖.mp3</a>
-				</li>
+			<%
+					}
+				}
+			%>
 			</ul>
 		</div>
+		<span id="musics" title='<%=getServletContext().getContextPath()%>/resources/musics/Candy_Wind - 青空.flac'></span>
 		<div id="control">
 			<audio id="music">
 				<source src="">

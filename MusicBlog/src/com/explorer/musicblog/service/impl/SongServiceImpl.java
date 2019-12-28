@@ -40,4 +40,9 @@ public class SongServiceImpl implements ISongService{
 		return iSongDao.getSongById(id, name);
 	}
 
+	@Override
+	public List<Song> getByName(Integer num,String name) {
+		return iSongDao.getByName(num,name);
+	}
+
 }

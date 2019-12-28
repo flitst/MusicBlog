@@ -8,14 +8,14 @@ package com.explorer.musicblog.pojo;
 public class Song {
 	private Integer id;		//歌曲ID
 	private String 	name;	//歌曲名
-	private Singer 	singer;	//歌手
-	private Lyric 	lyric;	//歌词
-	private Type 	type;	//类型
+	private String	singer;	//歌手
+	private String 	lyric;	//歌词
+	private Integer type;	//类型
 	private String 	length;	//时长
 	
 	public Song() {}
 
-	public Song(Integer id, String name, Singer singer, Lyric lyric, Type type, String length) {
+	public Song(Integer id, String name, String singer, String lyric, Integer type, String length) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -47,27 +47,27 @@ public class Song {
 		this.name = name;
 	}
 
-	public Singer getSinger() {
+	public String getSinger() {
 		return singer;
 	}
 
-	public void setSinger(Singer singer) {
+	public void setSinger(String singer) {
 		this.singer = singer;
 	}
 
-	public Lyric getLyric() {
+	public String getLyric() {
 		return lyric;
 	}
 
-	public void setLyric(Lyric lyric) {
+	public void setLyric(String lyric) {
 		this.lyric = lyric;
 	}
 
-	public Type getType() {
+	public Integer getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 

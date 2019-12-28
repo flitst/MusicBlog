@@ -28,7 +28,7 @@
 				Object obj = request.getServletContext().getAttribute("types");
 				if(obj instanceof List){
 					List<Map<String,Object>> types = (List<Map<String,Object>>)obj;
-					%>
+				%>
 					音乐类型<select id="type" name="type">
 					<% 
 					for(Map<String,Object> map:types){
@@ -42,17 +42,17 @@
 								t = new Type();
 								t.setId(Integer.parseInt(key));
 								t.setName(value.toString());
-						%>
+					%>
 						<option value="<%=t.getId()%> <%=t.getName()%>"><%=t.getName()%></option>
-						<%
+					<%
 							}
 						}
 					}
 					%>
-							</select>
-					<%
+						</select>
+				<%
 				}
-			%>
+				%>
 				<br>
 				<input type="text" name="length" placeholder="请输入歌曲长度" /><br>
 				<input type="submit" value="添加"/><br>

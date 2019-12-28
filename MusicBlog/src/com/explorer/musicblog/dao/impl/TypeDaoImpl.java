@@ -25,7 +25,7 @@ public class TypeDaoImpl implements ITypeDao {
 		System.out.println("获取所有歌曲类型");
 		DBUtil db = new DBUtil();
 		Connection conn = null;
-		String sql = "select * from `type`";
+		String sql = "select * from `tb_type`";
 		try {
 			conn = db.getConn();
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -41,8 +41,6 @@ public class TypeDaoImpl implements ITypeDao {
 				list.add(map);
 			}
 			return list;
-		} catch (CustomException e1) {
-			e1.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

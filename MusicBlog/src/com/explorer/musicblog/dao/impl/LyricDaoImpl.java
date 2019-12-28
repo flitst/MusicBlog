@@ -63,7 +63,7 @@ public class LyricDaoImpl implements ILyricDao {
 			DBUtil db = new DBUtil();
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
 			}
 			if(conn != null) {

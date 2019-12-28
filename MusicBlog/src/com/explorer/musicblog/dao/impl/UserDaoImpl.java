@@ -52,7 +52,7 @@ public class UserDaoImpl implements IUserDao {
 		Integer i = null;
 		try {
 			conn = db.getConn();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			throw new CustomException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
@@ -93,10 +93,10 @@ public class UserDaoImpl implements IUserDao {
 	public User login(String uname,String pwd) throws CustomException {
 		if (uname != null && pwd != null && !"".equals(uname.trim()) && !"".equals(pwd.trim())) {
 			DBUtil db = new DBUtil();
-			String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`registerTime`,`modifyTime` from `user`where `account`=? and `pwd`=?";
+			String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`registerTime`,`modifyTime` from `tb_user`where `account`=? and `pwd`=?";
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				throw new CustomException("获取数据库连接失败!" + e.getMessage());
 			}
 			if(conn != null) {
@@ -182,7 +182,7 @@ public class UserDaoImpl implements IUserDao {
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			throw new CustomException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
@@ -226,7 +226,7 @@ public class UserDaoImpl implements IUserDao {
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			throw new CustomException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
@@ -266,7 +266,7 @@ public class UserDaoImpl implements IUserDao {
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			throw new CustomException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
@@ -297,7 +297,7 @@ public class UserDaoImpl implements IUserDao {
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			throw new CustomException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
@@ -346,7 +346,7 @@ public class UserDaoImpl implements IUserDao {
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			throw new CustomException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
@@ -381,7 +381,7 @@ public class UserDaoImpl implements IUserDao {
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			throw new CustomException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
@@ -422,7 +422,7 @@ public class UserDaoImpl implements IUserDao {
 			DBUtil db = new DBUtil();
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
 			}
 			if(conn != null) {
@@ -461,7 +461,7 @@ public class UserDaoImpl implements IUserDao {
 			DBUtil db = new DBUtil();
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
 			}
 			if (conn != null) {
@@ -526,7 +526,7 @@ public class UserDaoImpl implements IUserDao {
 			DBUtil db = new DBUtil();
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
 			}
 			if(conn != null) {

@@ -41,5 +41,12 @@ public interface ISongService {
 	 * @return
 	 */
 	public Song getSongById(int id, String name);
-	
+
+	/**
+	 *根据歌曲名查询歌曲
+	 * @param num  用于获取分页当前页数
+	 * @param name 查询的歌曲名
+	 * @return
+	 */
+	public List<Song> getByName(Integer num,String name);
 }

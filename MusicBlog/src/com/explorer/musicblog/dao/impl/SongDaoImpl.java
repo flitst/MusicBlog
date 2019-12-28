@@ -5,15 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.explorer.musicblog.dao.ISongDao;
 import com.explorer.musicblog.exception.CustomException;
-import com.explorer.musicblog.pojo.Lyric;
-import com.explorer.musicblog.pojo.Singer;
 import com.explorer.musicblog.pojo.Song;
-import com.explorer.musicblog.pojo.Type;
 import com.explorer.musicblog.utils.DBUtil;
 
 /**
@@ -40,7 +38,7 @@ public class SongDaoImpl implements ISongDao {
 			i = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} catch (CustomException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
@@ -60,7 +58,7 @@ public class SongDaoImpl implements ISongDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
@@ -86,7 +84,7 @@ public class SongDaoImpl implements ISongDao {
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
@@ -110,35 +108,30 @@ public class SongDaoImpl implements ISongDao {
 
 	@Override
 	public List<Song> getAll() {
-		String sql = "select * from `tb_song`";
-		List<Song> songs = new ArrayList<>();
-		Song song = new Song();
+		//"select * from `tb_song`"
+		String sql = "select id ID,name 歌名,singer 歌手,lyric 歌词,type 类型,length 时长 from tb_song limit 0,3";
 		DBUtil db = new DBUtil();
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();
+			List<Song> songs = new LinkedList<Song>();
+			Song song = null;
 			while (rs.next()) {
-				song.setName(rs.getString("name"));
-				Object singer = rs.getObject("singer");
-				if(singer instanceof Type) {
-					song.setSinger((Singer)singer);
-				}
-				Object lyric = rs.getObject("lyric");
-				if(lyric instanceof Lyric) {
-					song.setLyric((Lyric)lyric);
-				}
-				Object type = rs.getObject("type");
-				if(type instanceof Type) {
-					song.setType((Type)type);
-				}
-				song.setLength(rs.getString("length"));
+				song = new Song();
+				song.setId(rs.getInt("ID"));
+				song.setName(rs.getString("歌名"));
+				song.setSinger(rs.getString("歌手"));
+				song.setLyric(rs.getString("歌词"));
+				song.setType(rs.getInt("类型"));
+				song.setLength(rs.getString("时长"));
 				songs.add(song);
 			}
+			return songs;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -148,38 +141,72 @@ public class SongDaoImpl implements ISongDao {
 				e.printStackTrace();
 			}
 		}
-		return songs;
+		return null;
 	}
-
+	@Override
+	public List<Song> getByName(Integer num,String name) {
+		String sql = "select id ID,name 歌名,singer 歌手,lyric 歌词,type 类型,length 时长 from tb_song";
+		if(num != null && !"".equals(num)) {
+			sql = "select id ID,name 歌名,singer 歌手,lyric 歌词,type 类型,length 时长 from tb_song where name like ?";
+		}
+		DBUtil db = new DBUtil();
+		try {
+			try {
+				conn = db.getConn();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+name+"%");
+			System.out.println("pstmt:"+pstmt);
+			rs = pstmt.executeQuery();
+			System.out.println("rs:"+rs);
+			List<Song> songs = new LinkedList<Song>();
+			Song song = null;
+			while (rs.next()) {
+				song = new Song();
+				song.setId(rs.getInt("ID"));
+				song.setName(rs.getString("歌名"));
+				song.setSinger(rs.getString("歌手"));
+				song.setLyric(rs.getString("歌词"));
+				song.setType(rs.getInt("类型"));
+				song.setLength(rs.getString("时长"));
+				songs.add(song);
+			}
+			return songs;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				db.close(rs, pstmt, conn);
+			} catch (CustomException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
 	@Override
 	public Song getSongById(Integer id, String name) {
-		String sql = "select * from `tb_song` where `id`=?";
+		//select * from `tb_song` where `id`=?
+		String sql = "select id ID,name 名字,singer 歌手,lyric 歌词,type 类型,length 长度 from tb_song";
 		Song song = new Song();
 		DBUtil db = new DBUtil();
 		try {
 			try {
 				conn = db.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, id);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
-				song.setName(rs.getString("name"));
-				Object singer = rs.getObject("singer");
-				if(singer instanceof Type) {
-					song.setSinger((Singer)singer);
-				}
-				Object lyric = rs.getObject("lyric");
-				if(lyric instanceof Lyric) {
-					song.setLyric((Lyric)lyric);
-				}
-				Object type = rs.getObject("type");
-				if(type instanceof Type) {
-					song.setType((Type)type);
-				}
-				song.setLength(rs.getString("length"));
+				song.setId(rs.getInt("ID"));
+				song.setName(rs.getString("歌名"));
+				song.setSinger(rs.getString("歌手"));
+				song.setLyric(rs.getString("歌词"));
+				song.setType(rs.getInt("类型"));
+				song.setLength(rs.getString("时长"));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -207,5 +234,4 @@ public class SongDaoImpl implements ISongDao {
 	public List<Map<String, Object>> get(List<Map<String, Object>> params) {
 		return null;
 	}
-
 }

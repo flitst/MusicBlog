@@ -26,7 +26,7 @@ public class RootDaoImpl implements IRootDao {
 			DBUtil util = new DBUtil();
 			try {
 				conn = util.getConn();
-			} catch (CustomException e) {
+			} catch (Exception e) {
 				throw new CustomException("获取数据库连接失败!"+e.getMessage());
 			}
 			try {

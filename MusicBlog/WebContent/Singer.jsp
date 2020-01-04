@@ -49,7 +49,7 @@
 					<td><%=s.getSex()%></td>
 					<td><%=s.getHead()%></td>
 					<td><%=s.getImage()%></td>
-					<td><%=s.getAddTime()%></td>
+					<td><%=s.getCreateTime()%></td>
 					<td><%=s.getUpdateTime()%></td>
 				</tr>
 		<%

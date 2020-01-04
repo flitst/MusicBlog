@@ -52,7 +52,7 @@
 					<td><%=singer.getSex()%></td>
 					<td><%=singer.getHead()%></td>
 					<td><%=singer.getImage()%></td>
-					<td><%=singer.getAddTime()%></td>
+					<td><%=singer.getCreateTime()%></td>
 					<td><%=singer.getUpdateTime()%></td>
 				</tr>
 			</tbody>

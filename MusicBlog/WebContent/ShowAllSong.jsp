@@ -40,7 +40,8 @@
 			<td> <%=all.get(i).getSinger()%> </td>
 			<td> <%=all.get(i).getLyric()%> </td>
 			<td> <%=all.get(i).getType()%> </td>
-			<td> <%=all.get(i).getLength()%> </td>
+			<td> <%=all.get(i).getCreateTime()%> </td>
+			<td> <%=all.get(i).getUpdateTime()%> </td>
 		</tr>
 		<%
 				}

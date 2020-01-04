@@ -27,7 +27,6 @@ public class CheckUserName extends HttpServlet {
 		doPost(req, resp);
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String id = req.getParameter("loginId");

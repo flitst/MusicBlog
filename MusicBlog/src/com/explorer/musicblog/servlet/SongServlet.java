@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.explorer.musicblog.pojo.Lyric;
-import com.explorer.musicblog.pojo.Singer;
 import com.explorer.musicblog.pojo.Song;
 import com.explorer.musicblog.pojo.Type;
 import com.explorer.musicblog.service.ISongService;
@@ -84,14 +83,15 @@ public class SongServlet extends HttpServlet {
 		String singer = req.getParameter("singer");
 		String lyric = req.getParameter("lyric");
 		String type = req.getParameter("type");
-		String length = req.getParameter("length");
+		String createTime = req.getParameter("createtime");
+		String updateTime = req.getParameter("updatetime");
 		System.out.println("name"+name);
 		System.out.println("singer"+singer);
 		System.out.println("lyric"+lyric);
 		System.out.println("type"+type);
-		System.out.println("length"+length);
 		if(name != null && !"".equals(name.trim()) && singer != null && !"".equals(singer.trim()) && lyric != null && !"".equals(lyric.trim())
-				&& type != null && !"".equals(type.trim()) && length != null && !"".equals(length.trim())) {
+				&& type != null && !"".equals(type.trim()) && createTime != null && !"".equals(createTime.trim())
+				&& updateTime != null && !"".equals(updateTime.trim())) {
 			Song s = new Song();
 			String str = type.substring(0, 1);
 			System.out.println(str);
@@ -99,16 +99,17 @@ public class SongServlet extends HttpServlet {
 				s.setId(Integer.parseInt(str));
 			}
 			s.setName(name);
-			Singer sin = new Singer();
+			//Singer sin = new Singer();
 //			sin.setName(singer);
 //			s.setSinger(sin);
 			Lyric l = new Lyric();
 			l.setLyric(lyric);
 //			s.setLyric(l);
 			Type t = new Type();
-			t.setName(type);
+			t.setType(type);
 //			s.setType(t);
-			s.setLength(length);
+			s.setCreateTime(createTime);
+			s.setUpdateTime(updateTime);
 			System.out.println("song:"+s);
 			UploadServlet us = new UploadServlet(s.getName());
 			us.doGet(req, res);

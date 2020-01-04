@@ -13,6 +13,7 @@
 		<%
 			Object obj = request.getAttribute("users");
 			if(obj instanceof List){
+				@SuppressWarnings("unchecked")
 				List<Map<String,Object>> users = (List<Map<String,Object>>)obj;
 				User u = null;
 				for (Map<String, Object> map : users) {
@@ -27,18 +28,18 @@
 		%>
 		<a href="#">
 		<%
-							out.println(u.getId()+"\t");
-							out.println(u.getAccount()+"\t");
-							out.println(u.getPwd()+"\t");
-							out.println(u.getNickname()+"\t");
-							out.println(u.getSignature()+"\t");
-							out.println(u.getAge()+"\t");
-							out.println(u.getSex()+"\t");
-							out.println(u.getHead()+"\t");
-							out.println(u.getImage()+"\t");
-							out.println(u.getEmail()+"\t");
-							out.println(u.getMobile()+"\t");
-							out.println(u.getRegisterTime()+"\t");
+		    out.println(u.getId()+"\t");
+									out.println(u.getAccount()+"\t");
+									out.println(u.getPwd()+"\t");
+									out.println(u.getNickname()+"\t");
+									out.println(u.getSignature()+"\t");
+									out.println(u.getAge()+"\t");
+									out.println(u.getSex()+"\t");
+									out.println(u.getHead()+"\t");
+									out.println(u.getImage()+"\t");
+									out.println(u.getEmail()+"\t");
+									out.println(u.getMobile()+"\t");
+									out.println(u.getCreateTime()+"\t");
 		%>
 		</a>&nbsp;&nbsp;&nbsp;
 		<input type="button" value="修改"/>&nbsp;&nbsp;<a href="UserManagerServlet.do?del=true&id=<%=u.getId()%>">删除</a><br>

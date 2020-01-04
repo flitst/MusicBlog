@@ -1,10 +1,10 @@
 package com.explorer.musicblog.dao.impl;
 
-import com.explorer.musicblog.dao.ILyricDao;
-import com.explorer.musicblog.dao.ISingerDao;
-import com.explorer.musicblog.dao.ISongDao;
-import com.explorer.musicblog.dao.ITypeDao;
-import com.explorer.musicblog.dao.IUserDao;
+import com.explorer.musicblog.dao.ILyricDAO;
+import com.explorer.musicblog.dao.ISingerDAO;
+import com.explorer.musicblog.dao.ISongDAO;
+import com.explorer.musicblog.dao.ITypeDAO;
+import com.explorer.musicblog.dao.IUserDAO;
 
 /**
  * zhangzhong
@@ -12,19 +12,19 @@ import com.explorer.musicblog.dao.IUserDao;
  */
 public class DaoFactory {
 
-	public static IUserDao getUserDao() {
+	public static IUserDAO getUserDao() {
 		return new UserDaoImpl();
 	}
-	public static ITypeDao getTypeDao() {
+	public static ITypeDAO getTypeDao() {
 		return new TypeDaoImpl();
 	}
-	public static ISingerDao getSingerDao() {
+	public static ISingerDAO getSingerDao() {
 		return new SingerDaoImpl();
 	}
-	public static ISongDao getSongDao() {
+	public static ISongDAO getSongDao() {
 		return new SongDaoImpl();
 	}
-	public static ILyricDao getLyricDao() {
+	public static ILyricDAO getLyricDao() {
 		return new LyricDaoImpl();
 	}
 }

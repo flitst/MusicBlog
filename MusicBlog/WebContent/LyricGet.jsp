@@ -14,6 +14,7 @@
 		<%
 			Object obj = request.getAttribute("all");
 			if(obj != null && obj instanceof List){
+				@SuppressWarnings("unchecked")
 				List<Map<String,Singer>> list = (List<Map<String,Singer>>)obj;
 				for(Map<String,Singer> tm : list){
 					Iterator<Entry<String, Singer>> itr = tm.entrySet().iterator();

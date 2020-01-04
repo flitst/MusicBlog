@@ -7,7 +7,7 @@
 		<title>管理员消息</title>
 	</head>
 	<body>
-		信息:<h3>${msg}</h3>
+		信息:<h3 style="color:red;font-size:16px">${msg}</h3>
 		<a href="RootLogin.jsp">返回登录</a>
 	</body>
 </html>

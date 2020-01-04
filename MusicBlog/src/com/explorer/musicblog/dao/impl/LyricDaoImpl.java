@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.explorer.musicblog.dao.ILyricDao;
+import com.explorer.musicblog.dao.ILyricDAO;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Lyric;
 import com.explorer.musicblog.utils.DBUtil;
@@ -18,7 +18,7 @@ import com.explorer.musicblog.utils.DBUtil;
  * zhangzhong
  * Dec 11, 2019 6:19:29 PM
  */
-public class LyricDaoImpl implements ILyricDao {
+public class LyricDaoImpl implements ILyricDAO {
 
 	private Connection conn = null;
 	private PreparedStatement ps = null;
@@ -97,6 +97,26 @@ public class LyricDaoImpl implements ILyricDao {
 				}
 			}
 		}
+		return null;
+	}
+
+	@Override
+	public List<Lyric> getAll() {
+		return null;
+	}
+
+	@Override
+	public Integer insert(Lyric type) {
+		return null;
+	}
+
+	@Override
+	public Integer update(Lyric type) {
+		return null;
+	}
+
+	@Override
+	public Integer delete(Lyric type) {
 		return null;
 	}
 

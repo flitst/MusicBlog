@@ -8,7 +8,7 @@ import com.explorer.musicblog.pojo.Song;
  * @author	:zhangzhong
  * 创建时间	:2018年5月27日下午10:57:25
  */
-public interface ISongDao extends ICommonDao<Song,String,Object>{
+public interface ISongDAO extends ICommonDAO<Song,String,Object>{
 
 	/**
 	 * 添加歌曲

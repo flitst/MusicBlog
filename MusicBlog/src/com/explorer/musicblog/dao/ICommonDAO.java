@@ -8,8 +8,36 @@ import com.explorer.musicblog.exception.CustomException;
 /**
  * zhangzhong 2018年5月28日下午11:53:10 通用方法
  */
-public interface ICommonDao<T, K, V> {
+public interface ICommonDAO<T, K, V> {
 
+	/**
+	 * 	获取所有
+	 * @return
+	 * @throws CustomException
+	 */
+	List<T> getAll();
+	
+	/**
+	 * 	新增
+	 * @param type
+	 * @return
+	 */
+	public Integer insert(T type);
+	
+	/**
+	 * 	修改
+	 * @param type
+	 * @return
+	 */
+	public Integer update(T type);
+	
+	/**
+	 *	 删除
+	 * @param type
+	 * @return
+	 */
+	public Integer delete(T type);
+	
 	/**
 	 * 通用增改
 	 * 

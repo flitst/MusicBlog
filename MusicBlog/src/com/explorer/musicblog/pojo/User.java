@@ -21,13 +21,13 @@ public class User {
 	private String   image; 		// 用户照片
 	private String   email; 		// 用户邮箱
 	private String 	 mobile; 		// 用户邮箱
-	private String   registerTime;  // 注册时间
-	private String   modifyTime;  	// 修改时间
+	private String   createTime;    // 注册时间
+	private String   updateTime;  	// 修改时间
 
 	public User() {}
 	
 	public User(Integer id, String account, String pwd,String nickname, String signature, Byte age, Byte sex, 
-			String[] hobby, String head, String image, String email, String mobile, String registerTime,String modifyTime) {
+			String[] hobby, String head, String image, String email, String mobile, String createTime,String updateTime) {
 		super();
 		this.id = id;
 		this.account = account;
@@ -41,16 +41,16 @@ public class User {
 		this.image = image;
 		this.email = email;
 		this.mobile = mobile;
-		this.registerTime = registerTime;
-		this.modifyTime = modifyTime;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
 	}
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", account=" + account + ", pwd=" + pwd + ", nickname=" + nickname + ", signature=" + signature + ", age="
 				+ age + ", sex=" + sex + ", hobby=" + Arrays.toString(hobby) + ", head="
-				+ head + ", image=" + image + ", email=" + email + ", mobile=" + mobile + ", registerTime="
-				+ registerTime + modifyTime + "]";
+				+ head + ", image=" + image + ", email=" + email + ", mobile=" + mobile + ", createTime="
+				+ createTime + ", updateTime=" + updateTime + "]";
 	}
 
 	public Integer getId() {
@@ -157,27 +157,27 @@ public class User {
 		this.mobile = mobile;
 	}
 
-	public String getRegisterTime() {
-		return registerTime;
+	public String getCreateTime() {
+		return createTime;
 	}
 
-	public void setRegisterTime(String registerTime) {
-		if(null != registerTime) {
-			this.registerTime = registerTime;
+	public void setCreateTime(String createTime) {
+		if(null != createTime) {
+			this.createTime = createTime;
 		} else {
-			this.registerTime = new Date().toString();
+			this.createTime = new Date().toString();
 		}
 	}
 
-	public String getModifyTime() {
-		return modifyTime;
+	public String getUpdateTime() {
+		return updateTime;
 	}
 
-	public void setModifyTime(String modifyTime) {
-		if(modifyTime != null) {
-			this.modifyTime = modifyTime;
+	public void setUpdateTime(String updateTime) {
+		if(updateTime != null) {
+			this.updateTime = updateTime;
 		} else {
-			this.modifyTime = new Date().toString();
+			this.updateTime = new Date().toString();
 		}
 	}
 	

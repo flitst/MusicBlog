@@ -8,12 +8,13 @@
 		<title>歌手列表</title>
 	</head>
 	<body>
-		<form action="GetSingerServlet.do" method="get">
+		<form action="SingerServlet.do?getAll" method="get">
 			<input type="submit" value="获取">
 		</form>
 		<%
 			Object obj = request.getAttribute("all");
 			if(obj != null && obj instanceof List){
+				@SuppressWarnings("unchecked")
 				List<Map<String,Singer>> list = (List<Map<String,Singer>>)obj;
 				for(Map<String,Singer> tm : list){
 					Iterator<Entry<String, Singer>> itr = tm.entrySet().iterator();

@@ -27,23 +27,24 @@
 				<%
 				Object obj = request.getServletContext().getAttribute("types");
 				if(obj instanceof List){
+					@SuppressWarnings("unchecked")
 					List<Map<String,Object>> types = (List<Map<String,Object>>)obj;
 				%>
 					音乐类型<select id="type" name="type">
-					<% 
-					for(Map<String,Object> map:types){
-						Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
-						if(iterator.hasNext()) {
-							Entry<String, Object> next = iterator.next();
-							String key = next.getKey();
-							Object value = next.getValue();
-							Type t = null;
-							if(value instanceof String){
-								t = new Type();
-								t.setId(Integer.parseInt(key));
-								t.setName(value.toString());
+					<%
+						for(Map<String,Object> map:types){
+									Iterator<Entry<String, Object>> iterator = map.entrySet().iterator();
+									if(iterator.hasNext()) {
+										Entry<String, Object> next = iterator.next();
+										String key = next.getKey();
+										Object value = next.getValue();
+										Type t = null;
+										if(value instanceof String){
+											t = new Type();
+											t.setId(Integer.parseInt(key));
+											t.setType(value.toString());
 					%>
-						<option value="<%=t.getId()%> <%=t.getName()%>"><%=t.getName()%></option>
+						<option value="<%=t.getId()%> <%=t.getType()%>"><%=t.getType()%></option>
 					<%
 							}
 						}

@@ -52,16 +52,26 @@
 	<body>
 		<form action="" method="post" id="forms" onsubmit="return checkForm()"><!-- javascript:return check() -->
 			<div id="box">
-				<span>账&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号:</span><input type="text" name="account" id="id"  placeholder="请输入账号" onkeyup="checkId()"/>
+				<span>账&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号:</span>
+				<input type="text" name="account" id="id"  placeholder="请输入账号" onkeyup="checkId()"/>
 				<font id="userId" size="3px"></font><span>${id}</span><br><br>
-				<span>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:</span><input type="password" name="pwd" id="pwd"  placeholder="请输入密码" onkeyup="checkPwd()"/>
+				
+				<span>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码:</span>
+				<input type="password" name="pwd" id="pwd"  placeholder="请输入密码" onkeyup="checkPwd()"/>
 				<span id="userPwd"><span>${pwd}</span></span><br><br>
-				<span>确认密码:</span><input type="password" name="affirmPwd" id="affirmPwd"  placeholder="请确认密码" onblur="checkAffirmPwd()"/>
+				
+				<span>确认密码:</span>
+				<input type="password" name="affirmPwd" id="affirmPwd"  placeholder="请确认密码" onblur="checkAffirmPwd()"/>
 				<span id="userAffirmPwd"></span><span>${affirm_Pwd}</span><br><br>
-				<span>手&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;机:</span><input type="text" id = "mobile" name="mobile"  placeholder="请输入手机号" onblur="checkMobile()" />
+				
+				<span>手&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;机:</span>
+				<input type="text" id = "mobile" name="mobile"  placeholder="请输入手机号" onblur="checkMobile()" />
 				<span id="userMobile"></span><span>${mobile}</span><br><br>
-				<span>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱:</span><input type="text" id = "email" name="email"  placeholder="请输入邮箱" onblur="checkEmail()"/>
+				
+				<span>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱:</span>
+				<input type="text" id = "email" name="email"  placeholder="请输入邮箱" onblur="checkEmail()"/>
 				<font id="userEmail" size="3px"></font><span>${email}</span><br>
+				
 				<!-- 验证方式: <input type="text" name="ur_checkway" /><br> -->
 				<p align="center">
 					<button id="check" onclick="checkValue()">提交</button>
@@ -100,11 +110,12 @@
 				}
 				var mobile = checkEmpty("mobile","userMobile","手机号不能为空!");
 				if(mobile){
-					
+					alert("mobile:"+mobile);
 				}
 				//var mobileExpre = "/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/";
-				var email = checkEmpty("email","userEmail",);
+				var email = checkEmpty("email","userEmail","邮箱不能为空!");
 				if(email){
+					alert("email:"+email);
 					var mobileExpre = "/^\w+@\w+.\w+$/";
 					var eml = getId("email");
 					checkEmail(eml,mobileExpre,eml.value);
@@ -138,7 +149,8 @@
 	            }
 			}
 			function checkForm(){
-				
+				alert("form");
+				//this.submit();
 			}
 			<%-- 检查用户ID是否合法 --%>
 			/* function checkAccount(){

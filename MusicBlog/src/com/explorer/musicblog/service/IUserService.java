@@ -1,7 +1,6 @@
 package com.explorer.musicblog.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.User;
@@ -17,7 +16,7 @@ public interface IUserService extends ICommonService<User, String, Object> {
 	 * @param user
 	 * @throws Exception 
 	 */
-	public boolean register(User user) throws Exception;
+	public Integer insert(User user);
 	
 	/**
 	 * 用户登录
@@ -38,11 +37,18 @@ public interface IUserService extends ICommonService<User, String, Object> {
 	public boolean delete(Integer id) throws Exception;
 
 	/**
-	 * 修改用户
+	 * 	修改用户
 	 * 
 	 * @param t
 	 */
-	public boolean update(User user) throws Exception;
+	public Integer update(User user);
+
+	/**
+	 * 	修改用户密码
+	 * @param oldpwd 修改之前的密码
+	 * @param user 修改的信息，包括邮箱、手机验证方式
+	 */
+	public Integer updatePWD(String oldpwd,User user);
 
 	/**
 	 * 获取用户数量
@@ -56,7 +62,7 @@ public interface IUserService extends ICommonService<User, String, Object> {
 	 * 
 	 * @return
 	 */
-	public List<Map<String,Object>> getAll() throws Exception;
+	public List<User> getAll();
 
 	/**
 	 * 根据用户编号查询用户

@@ -137,7 +137,10 @@
 	<div id="center">
 		<bgsound loop="infinite" src="<%=getServletContext().getContextPath()%>/resources/musics/Candy_Wind - 拂晓车站.flac">
 		<div id="list">
-		<% List<Song> all = (List)request.getSession().getAttribute("songs");%>
+		<% 
+			@SuppressWarnings("unchecked")
+			List<Song> all = (List<Song>)request.getAttribute("songs");
+		%>
 			<%
 				if(all != null && all.size() > 0){
 			%>

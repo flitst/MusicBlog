@@ -3,7 +3,7 @@ package com.explorer.musicblog.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import com.explorer.musicblog.dao.IUserDao;
+import com.explorer.musicblog.dao.IUserDAO;
 import com.explorer.musicblog.dao.impl.DaoFactory;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.User;
@@ -14,16 +14,15 @@ import com.explorer.musicblog.service.IUserService;
  */
 public class UserServiceImpl implements IUserService {
 
-	IUserDao iu = DaoFactory.getUserDao();
+	IUserDAO iu = DaoFactory.getUserDao();
 	User u = new User();
 
 	@Override
-	public boolean register(User user) throws Exception {
+	public Integer insert(User user){
 		if (user != null) {
-			iu.register(user);
-			return true;
+			return iu.insert(user);
 		}
-		return false;
+		return null;
 	}
 
 	@Override
@@ -41,21 +40,25 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public boolean update(User user) throws Exception {
+	public Integer update(User user){
 		if (user != null) {
-			iu.update(user);
-			return true;
+			return iu.update(user);
 		}
-		return false;
+		return null;
 	}
 
+	@Override
+	public Integer updatePWD(String oldpwd,User user) {
+		return iu.updatePWD(oldpwd,user);
+	}
+	
 	@Override
 	public Integer getSize() throws CustomException {
 		return iu.getSize();
 	}
 
 	@Override
-	public List<Map<String, Object>> getAll() throws Exception {
+	public List<User> getAll(){
 		return iu.getAll();
 	}
 
@@ -95,4 +98,8 @@ public class UserServiceImpl implements IUserService {
 		return iu.get(params);
 	}
 
+	@Override
+	public Integer delete(User type) {
+		return null;
+	}
 }

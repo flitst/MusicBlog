@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.explorer.musicblog.dao.IUserDao;
+import com.explorer.musicblog.dao.IUserDAO;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.User;
 import com.explorer.musicblog.utils.DBUtil;
@@ -19,41 +19,28 @@ import com.explorer.musicblog.utils.DBUtil;
 /**
  * zhangzhong 2018年5月28日下午11:58:41
  */
-public class UserDaoImpl implements IUserDao {
+public class UserDaoImpl implements IUserDAO {
+    
 	Connection conn = null;
 	PreparedStatement pstmt = null;
 	ResultSet rs = null;
 
-	// 给用户调用创建一个唯一实例
-	private static UserDaoImpl instance = null;
-
 	/**
-	 * 获取实例
-	 * @return
-	 */
-	public static synchronized UserDaoImpl getInstance() {
-		if (instance == null) {
-			instance = new UserDaoImpl();
-		}
-		return instance;
-	}
-
-	/**
-	 * 添加用户
+	    *     添加用户
 	 * @throws SQLException 
 	 * @throws CustomException 
 	 */
 	@Override
-	public Integer register(User user) throws SQLException, CustomException {
-		StringBuffer sql = new StringBuffer("insert into `user` ");
-		sql.append("(`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`registerTime`,`modifyTime`) ");
+	public Integer insert(User user){
+		StringBuffer sql = new StringBuffer("insert into `t_user` ");
+		sql.append("(`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time`) ");
 		sql.append("values (?,?,?,?,?,?,?,?,?,?,?,?,?);");
 		DBUtil db = new DBUtil();
 		Integer i = null;
 		try {
 			conn = db.getConn();
 		} catch (Exception e) {
-			throw new CustomException("获取数据库连接失败!" + e.getMessage());
+			new RuntimeException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
 			try {
@@ -69,17 +56,17 @@ public class UserDaoImpl implements IUserDao {
 				pstmt.setString(9, user.getImage());
 				pstmt.setString(10, user.getEmail());
 				pstmt.setString(11, user.getMobile());
-				pstmt.setString(12, user.getRegisterTime());
-				pstmt.setString(13, user.getModifyTime());
+				pstmt.setString(12, user.getCreateTime());
+				pstmt.setString(13, user.getUpdateTime());
 				System.out.println(sql);
 				i = pstmt.executeUpdate();
 			} catch (SQLException e) {
-				throw new CustomException("执行SQL失败!" + e.getMessage());
+				new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
 				try {
 					db.close(rs, pstmt, conn);
 				} catch (CustomException e) {
-					throw new CustomException("关闭数据库连接失败!" + e.getMessage());
+					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
 				}
 			}
 		}
@@ -93,7 +80,7 @@ public class UserDaoImpl implements IUserDao {
 	public User login(String uname,String pwd) throws CustomException {
 		if (uname != null && pwd != null && !"".equals(uname.trim()) && !"".equals(pwd.trim())) {
 			DBUtil db = new DBUtil();
-			String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`registerTime`,`modifyTime` from `tb_user`where `account`=? and `pwd`=?";
+			String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time` from `t_user`where `account`=? and `pwd`=?";
 			try {
 				conn = db.getConn();
 			} catch (Exception e) {
@@ -106,7 +93,7 @@ public class UserDaoImpl implements IUserDao {
 					pstmt.setString(2, pwd);
 					System.out.println(pstmt);
 					rs = pstmt.executeQuery();
-					List<Map<String,Object>> users = new ArrayList<Map<String,Object>>();
+					List<User> users = new ArrayList<User>();
 					User user = new User();
 					if(rs.next()) {
 						getUser(rs,user,users,true);
@@ -137,10 +124,9 @@ public class UserDaoImpl implements IUserDao {
 	 * @return	存储好的用户对象list
 	 * @throws CustomException
 	 */
-	private List<Map<String,Object>> getUser(ResultSet rs,User user,List<Map<String,Object>> list,boolean bool) throws CustomException {
+	private List<User> getUser(ResultSet rs,User user,List<User> list,boolean bool) throws CustomException {
 		while(bool) {
 			try {
-				Map<String, Object> map = new HashMap<String,Object>();
 				user.setId(rs.getInt("id"));
 				user.setAccount(rs.getString("account"));
 				user.setNickname(rs.getString("nickname"));
@@ -156,11 +142,10 @@ public class UserDaoImpl implements IUserDao {
 				String email = rs.getString("email");
 				user.setEmail(email);
 				user.setMobile(rs.getString("mobile"));
-				user.setRegisterTime(rs.getString("registerTime"));
-				user.setModifyTime(rs.getString("modifyTime"));
+				user.setCreateTime(rs.getString("create_time"));
+				user.setUpdateTime(rs.getString("update_time"));
 				System.out.println("getUser user:"+user);
-				map.put(user.getId().toString(), user);
-				list.add(map);
+				list.add(user);
 				return list;
 			} catch (SQLException e) {
 				throw new CustomException("执行SQL失败!" + e.getMessage());
@@ -169,6 +154,10 @@ public class UserDaoImpl implements IUserDao {
 		return null;
 	}
 
+	@Override
+	public Integer delete(User type) {
+		return null;
+	}
 	/**
 	 * 删除用户
 	 * @param id
@@ -177,7 +166,7 @@ public class UserDaoImpl implements IUserDao {
 	 */
 	@Override
 	public Integer delete(Integer id) throws CustomException {
-		String sql = "delete from `user` where `id`=?;";
+		String sql = "delete from `t_user` where `id`=?;";
 		Integer i = null;
 		DBUtil db = new DBUtil();
 		try {
@@ -205,12 +194,11 @@ public class UserDaoImpl implements IUserDao {
 	}
 
 	/**
-	 * 修改用户
-	 * @throws CustomException 
+	 *	 修改用户
 	 */
 	@Override
-	public Integer update(User user) throws CustomException {
-		StringBuffer sql = new StringBuffer("update `user` set ");
+	public Integer update(User user){
+		StringBuffer sql = new StringBuffer("update `t_user` set ");
 		sql.append("`nickname` = ? , ");
 		sql.append("`signature` = ? , ");
 		sql.append("`age` = ?, ");
@@ -220,14 +208,14 @@ public class UserDaoImpl implements IUserDao {
 		sql.append("`image` = ?, ");
 		sql.append("`email` = ?, ");
 		sql.append("`mobile` = ?,");
-		sql.append("`modifyTime` = ?");
+		sql.append("`update_time` = ?");
 		sql.append(" where `account` = ? and `pwd`=?;");
 		Integer i = null;
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
 		} catch (Exception e) {
-			throw new CustomException("获取数据库连接失败!" + e.getMessage());
+			throw new RuntimeException("连接数据库失败!" + e.getMessage());
 		}
 		if(conn != null) {
 			try {
@@ -241,27 +229,49 @@ public class UserDaoImpl implements IUserDao {
 				pstmt.setString(7, user.getImage());
 				pstmt.setString(8, user.getEmail());
 				pstmt.setString(9, user.getMobile());
-				pstmt.setString(10, user.getModifyTime());
+				pstmt.setString(10, user.getUpdateTime());
 				pstmt.setString(11, user.getAccount());
 				pstmt.setString(12, user.getPwd());
 				System.out.println("修改用户信息:"+pstmt);
 				i = pstmt.executeUpdate();
 			} catch (SQLException e) {
-				throw new CustomException("执行SQL失败!" + e.getMessage());
+				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
 				try {
 					db.close(rs, pstmt, conn);
 				} catch (CustomException e) {
-					throw new CustomException("关闭数据库连接失败!" + e.getMessage());
+					throw new RuntimeException("关闭数据库连接失败!" + e.getMessage());
 				}
 			}
 		}
 		return i;
 	}
 
+	/**
+	 *	修改用户密码
+	 */
+	@Override
+	public Integer updatePWD(String oldpwd,User user) { 
+		String sql = "update `t_user` set pwd=?,update_time=now() where mobile=? or email=?";
+		DBUtil db = new DBUtil();
+		conn = db.getConn();
+		Integer i = null;
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, user.getPwd());
+			pstmt.setString(2, user.getMobile());
+			pstmt.setString(3, user.getEmail());
+			i = pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("执行SQL失败!" + e.getMessage());
+		}
+		return i;
+	}
+	
 	@Override
 	public Integer getSize() throws CustomException {
-		String sql = "select count(*) from `user`";
+		String sql = "select count(*) from `t_user`";
 		System.out.println("获取用户数SQL:"+sql);
 		DBUtil db = new DBUtil();
 		try {
@@ -287,25 +297,24 @@ public class UserDaoImpl implements IUserDao {
 	}
 	
 	/**
-	 * 获取所有用户
-	 * @throws CustomException 
+	 *	 获取所有用户
 	 */
 	@Override
-	public List<Map<String,Object>> getAll() throws CustomException {
-		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`registerTime`,`modifyTime` from `user`";
+	public List<User> getAll(){
+		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time` from `t_user`";
 		System.out.println("获取所有用户SQL:"+sql);
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
 		} catch (Exception e) {
-			throw new CustomException("获取数据库连接失败!" + e.getMessage());
+			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
 		}
 		if(conn != null) {
 			try {
 				pstmt = conn.prepareStatement(sql);
 				System.out.println("获取所有用户pstmt:"+pstmt);
 				rs = pstmt.executeQuery();
-				List<Map<String,Object>> users = new ArrayList<Map<String,Object>>();
+				List<User> users = new ArrayList<User>();
 				User user = null;
 				while (rs.next()) {
 					//有一个用户就得新创建一个用户,在循环外面统一创建用户的话,后查询的用户会覆盖前面所查询的用户
@@ -319,16 +328,21 @@ public class UserDaoImpl implements IUserDao {
 					 * {3=User [uid=3, name=小晴, nickname=null, signature=null, age=18, sex=2, password=xiaoq, hobby=[[跑步, 看书, 旅游, 游泳, 乒乓球]], head=null, image=null, email=, mobile=, registerTime=2019-11-24 12:52:47]}]
 					 */
 					user = new User();
-					getUser(rs,user,users,true);
+					try {
+						getUser(rs,user,users,true);
+					} catch (CustomException e) {
+						e.printStackTrace();
+						throw new RuntimeException("获取用户信息失败!" + e.getMessage());
+					}
 				}
 				return users;
 			} catch (SQLException e) {
-				throw new CustomException("执行SQL失败!" + e.getMessage());
+				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
 				try {
 					db.close(rs, pstmt, conn);
 				} catch (CustomException e) {
-					throw new CustomException("关闭数据库连接失败!" + e.getMessage());
+					throw new RuntimeException("关闭数据库连接失败!" + e.getMessage());
 				}
 			}
 		}
@@ -341,7 +355,7 @@ public class UserDaoImpl implements IUserDao {
 	 */
 	@Override
 	public User getById(Integer id) throws CustomException {
-		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`registerTime`,`modifyTime` from `user` where `uid`=?";
+		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time` from `t_user` where `id`=?";
 		User user = new User();
 		DBUtil db = new DBUtil();
 		try {
@@ -377,7 +391,7 @@ public class UserDaoImpl implements IUserDao {
 	 */
 	@Override
 	public User getUser(User user) throws CustomException {
-		String sql = "select `account`,`email`,`mobile` from `user` where `account`=? or `email`=? or `mobile`=?";
+		String sql = "select `account`,`email`,`mobile` from `t_user` where `account`=? or `email`=? or `mobile`=?";
 		DBUtil db = new DBUtil();
 		try {
 			conn = db.getConn();
@@ -514,7 +528,7 @@ public class UserDaoImpl implements IUserDao {
 	@Override
 	public List<Map<String, Object>> get(List<Map<String, Object>> params){
 		if (params != null && params.size() > 0) {
-			StringBuffer sb = new StringBuffer("select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`registerTime`,`modifyTime` from `user` where 1=1");
+			StringBuffer sb = new StringBuffer("select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time` from `t_user` where 1=1");
 			for (int i = 0; i < params.size(); i++) {
 //				Map<String, Object> map = params.get(i);
 //				sb.append(" and "+map.get("param")+map.get("pattern")+map.get("value"));
@@ -550,8 +564,8 @@ public class UserDaoImpl implements IUserDao {
 						u.setImage(rs.getString("image"));
 						u.setEmail(rs.getString("email"));
 						u.setMobile(rs.getString("mobile"));
-						u.setRegisterTime(rs.getString("registerTime"));
-						u.setModifyTime(rs.getString("modifyTime"));
+						u.setCreateTime(rs.getString("create_time"));
+						u.setUpdateTime(rs.getString("update_time"));
 						System.out.println("user:" + u);
 						String str = u.getId().toString();
 						System.out.println("key:" + str);

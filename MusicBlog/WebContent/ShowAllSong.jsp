@@ -15,7 +15,10 @@
 					<input type="submit" value="搜索" />
 				</p>
 		</form>
-		<% List<Song> all = (List)request.getSession().getAttribute("all"); %>
+		<% 
+			@SuppressWarnings("unchecked")
+			List<Song> all = (List<Song>)request.getAttribute("all"); 
+		%>
 		<table>
 		<tr>
 			<td>ID</td>

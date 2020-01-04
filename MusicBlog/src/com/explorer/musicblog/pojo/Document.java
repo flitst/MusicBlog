@@ -6,37 +6,40 @@ package com.explorer.musicblog.pojo;
  */
 public class Document {
 
-	private Integer id;			//文章主键ID
-	private String title;		//文章标题
-	private String reference;	//文章引用
-	private String uid;			//发表作者
-	private String body;		//文章内容
-	private String publishTime;	//文章内容
-	private String updateTime;	//文章内容
-	private String commend;		//文章内容
+	private Integer id;			// 文章主键ID
+	private String title;		// 文章标题
+	private String reference;	// 文章引用
+	private String uid;			// 发表作者
+	private String body;		// 文章内容
+	private String publishTime;	// 文章内容
+	private String createTime;  // 创建时间
+	private String updateTime;  // 修改时间
+	private String commend;		// 文章内容
 	
 	public Document() {}
 
 	public Document(Integer id, String title, String reference, String uid, String body, String publishTime,
-			String updateTime, String commend) {
-		super();
-		this.id = id;
-		this.title = title;
-		this.reference = reference;
-		this.uid = uid;
-		this.body = body;
-		this.publishTime = publishTime;
-		this.updateTime = updateTime;
-		this.commend = commend;
-	}
+            String createTime, String updateTime, String commend) {
+        super();
+        this.id = id;
+        this.title = title;
+        this.reference = reference;
+        this.uid = uid;
+        this.body = body;
+        this.publishTime = publishTime;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.commend = commend;
+    }
 
-	@Override
-	public String toString() {
-		return "Document [id=" + id + ", title=" + title + ", reference=" + reference + ", uid=" + uid + ", body="
-				+ body + ", publishTime=" + publishTime + ", updateTime=" + updateTime + ", commend=" + commend + "]";
-	}
+    @Override
+    public String toString() {
+        return "Document [id=" + id + ", title=" + title + ", reference=" + reference + ", uid=" + uid + ", body="
+                + body + ", publishTime=" + publishTime + ", createTime=" + createTime + ", updateTime=" + updateTime
+                + ", commend=" + commend + "]";
+    }
 
-	public Integer getId() {
+    public Integer getId() {
 		return id;
 	}
 
@@ -107,5 +110,20 @@ public class Document {
 	public void setCommend(String commend) {
 		this.commend = commend;
 	}
-	
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
 }

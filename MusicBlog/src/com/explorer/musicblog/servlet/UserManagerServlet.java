@@ -3,14 +3,8 @@ package com.explorer.musicblog.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -41,14 +35,16 @@ public class UserManagerServlet extends HttpServlet {
 		String manager = req.getParameter("manager");
 		String login = req.getParameter("login");
 		IUserService ius = ServiceFactory.getUserService();
-		if(login != null && !"".equals(login.trim()) && "LOGIN".equals(login.toUpperCase())) {
-			login(ius,req,resp);
-		}
-		if(del != null && !"".equals(del.trim()) && "DEL".equals(login.toUpperCase())) {
-			delUser(ius,req,resp);
-		}
-		if(manager != null && !"".equals(manager.trim()) && "MANAGER".equals(login.toUpperCase())) {
-			managerUser(ius,req,resp);
+		if(login != null && !"".equals(login.trim()) && del != null && !"".equals(del.trim()) && manager != null && !"".equals(manager.trim())) {
+			if("LOGIN".equals(login.toUpperCase())) {
+				login(ius,req,resp);
+			}
+			if("DEL".equals(login.toUpperCase())) {
+				delUser(ius,req,resp);
+			}
+			if("MANAGER".equals(login.toUpperCase())) {
+				managerUser(ius,req,resp);
+			}
 		}
 	}
 	
@@ -132,7 +128,6 @@ public class UserManagerServlet extends HttpServlet {
 		String email = req.getParameter("email");
 		String mobile = req.getParameter("mobile");
 		User user = new User();
-		PrintWriter out = resp.getWriter();
 		if(account != null && "" != account && account.trim().length() > 0) {
 			checkAccount(req, resp, user,iu,account);
 			return;
@@ -140,7 +135,6 @@ public class UserManagerServlet extends HttpServlet {
 			System.out.println("ID账号为空!");
 			req.setAttribute("null_id","ID账号为空!");
 			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-			out.printf("null_id", null);
 		}
 		if(email != null && "" != email && email.trim().length() > 0) {
 			checkEmail(req, resp, user,iu,email);
@@ -206,12 +200,12 @@ public class UserManagerServlet extends HttpServlet {
     	//SimpleDateFormat sdf = new SimpleDateFormat("yyyy年第w周,第D天 MM月dd日 星期:F HH:mm:ss");
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 星期:F HH:mm:ss");
 		String date = sdf.format(new Date());
-		user.setRegisterTime(date); //设置注册时间
-		user.setModifyTime(date);	//设置修改时间
+		user.setCreateTime(date); //设置注册时间
+		user.setUpdateTime(date);	//设置修改时间
 		IUserService userService = new UserServiceImpl();
 		try {
-			boolean bool = userService.register(user);
-			if(bool) {
+			Integer num = userService.insert(user);
+			if(num != null && num > 0) {
 				System.out.println("注册成功!");
 				req.setAttribute("msg","注册成功!");
 				req.getRequestDispatcher("UserAddOKMessage.jsp").forward(req, resp);
@@ -241,50 +235,12 @@ public class UserManagerServlet extends HttpServlet {
 				}
 			} else {
 				System.out.println("获取账号失败!");
-				out.printf("null", null);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "null";
 	}
-	private void checkUserId(HttpServletRequest req, HttpServletResponse resp, User user, IUserService iu)throws IOException {
-		String account = user.getAccount();
-		PrintWriter out = resp.getWriter();
-		if (account != null && account != "" && account.trim().length() > 0) {
-			user.setAccount(account);
-			try {
-				List<Map<String, Object>> list = new ArrayList<>();
-				Map<String, Object> map = new HashMap<>();
-				map.put("param", "name");
-				map.put("pattern", "=");
-				map.put("value", "'" + account + "'");
-				list.add(map);
-				try {
-					List<Map<String, Object>> lists = iu.get(list);
-					for (Map<String, Object> maps : lists) {
-						Set<Entry<String, Object>> entrySet = maps.entrySet();
-						Iterator<Entry<String, Object>> iterator = entrySet.iterator();
-						if(iterator.hasNext()) {
-							Entry<String, Object> next = iterator.next();
-							String key = next.getKey();
-							System.out.println("key:"+key);
-							Object value = next.getValue();
-							System.out.println("value:"+value);
-						}
-					}
-				} catch (CustomException e) {
-					e.printStackTrace();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			System.out.println("ID账号为空!");
-			out.printf("null", null);
-		}
-	}
-	
 	private void checkEmail(HttpServletRequest req, HttpServletResponse resp,User user,IUserService iu,String email) throws IOException {
 		PrintWriter out = resp.getWriter();
 		if(email != "" && email != null && email.trim().length() > 0) {
@@ -302,7 +258,6 @@ public class UserManagerServlet extends HttpServlet {
 					}
 				} else {
 					System.out.println("获取邮箱错误!");
-					out.printf("null", null);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -312,36 +267,12 @@ public class UserManagerServlet extends HttpServlet {
 				System.out.println("邮箱为空!");
 				req.setAttribute("null_email","ID账号为空!");
 				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-				out.printf("null", null);
 			} catch (ServletException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private void checkEmail(HttpServletRequest req, HttpServletResponse resp, User user, IUserService iu)throws IOException {
-		PrintWriter out = resp.getWriter();
-		String email = req.getParameter("email");
-		if (email != null && email != "" && email.trim().length() > 0) {
-			user.setEmail(email);
-			User u = null;
-			try {
-				u = iu.getUser(user);
-				if (u.getEmail() != null && email.equals(u.getEmail())) {
-					System.out.println("此邮箱已注册!");
-					out.printf("not", false);
-				} else {
-					System.out.println("邮箱可以注册!");
-					out.printf("ok", true);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			System.out.println("邮箱为空!");
-			out.printf("null", null);
-		}
-	}
 	private void checkMobile(HttpServletRequest req, HttpServletResponse resp,User user,IUserService iu,String mobile) throws IOException {
 		PrintWriter out = resp.getWriter();
 		if(mobile != "" && mobile != null && mobile.trim().length() > 0) {
@@ -359,7 +290,6 @@ public class UserManagerServlet extends HttpServlet {
 					}
 				} else {
 					System.out.println("获取手机号错误!");
-					out.printf("null", null);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -369,37 +299,11 @@ public class UserManagerServlet extends HttpServlet {
 				System.out.println("手机号为空!");
 				req.setAttribute("null_mobile","ID账号为空!");
 				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-				out.printf("null", null);
 			} catch (ServletException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	private void checkMobile(HttpServletRequest req, HttpServletResponse resp, User user, IUserService iu)
-			throws IOException {
-		PrintWriter out = resp.getWriter();
-		String mobile = req.getParameter("mobile");
-		if (mobile != null && mobile != "" && mobile.trim().length() > 0) {
-			user.setMobile(mobile);
-			User u = null;
-			try {
-				u = iu.getUser(user);
-				if (u.getMobile() != null && mobile.equals(u.getMobile())) {
-					System.out.println("此手机号已注册!");
-					out.printf("not", false);
-				} else {
-					System.out.println("手机号可以注册!");
-					out.printf("ok", true);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			System.out.println("手机号为空!");
-			out.printf("null", null);
-		}
-	}
-	
 	/**
 	 * 删除用户
 	 * @param us
@@ -434,7 +338,7 @@ public class UserManagerServlet extends HttpServlet {
 	 */
 	private void managerUser(IUserService us, HttpServletRequest req,HttpServletResponse resp) {
 		try {
-			List<Map<String,Object>> all = us.getAll();
+			List<User> all = us.getAll();
 			System.out.println("all:"+all);
 			req.setAttribute("users", all);
 			req.getRequestDispatcher("/UserManager.jsp").forward(req, resp);

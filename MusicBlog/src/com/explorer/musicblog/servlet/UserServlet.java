@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -30,26 +29,21 @@ public class UserServlet extends HttpServlet {
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		System.out.println("service...");
 		Enumeration<String> names = req.getParameterNames();
 		IUserService ius = ServiceFactory.getUserService();
 		while (names.hasMoreElements()) {
 			String nextElement = names.nextElement();
-			System.out.println("nextElement:"+nextElement);
 			if (nextElement != null && !nextElement.isEmpty()) {
 				User u = new User();
 				if ("LOGIN".equals(nextElement.toUpperCase())) {
-					System.out.println("login...");
 					String account = req.getParameter("account");
 					String pwd = req.getParameter("pwd");
 					login(ius,account,pwd, req, resp);
 					break;
 				} else if ("REGISTER".equals(nextElement.toUpperCase())) {
-					System.out.println("register...");
 					register(ius, req, resp);
 					break;
 				} else if ("LOGOUT".equals(nextElement.toUpperCase())) {
-					System.out.println("logout...");
 					Object key = req.getSession().getAttribute("ukey");
 					if(key != null && key instanceof String) {
 						String ukey = (String)key;
@@ -61,19 +55,20 @@ public class UserServlet extends HttpServlet {
 					}
 					break;
 				} else if ("UPDATE".equals(nextElement.toUpperCase())) {
-					System.out.println("update...");
-					 update(req,resp);
+					req.getRequestDispatcher("UserUpdate.jsp").forward(req , resp);
+					//update(req,resp);
+					break;
+				} else if ("UPDATEPWD".equals(nextElement.toUpperCase())) {
+					req.getRequestDispatcher("UserPWDUpdate.jsp").forward(req , resp);
+					//updatePWD(ius,req,resp);
 					break;
 				} else if ("DELETE".equals(nextElement.toUpperCase())) {
-					System.out.println("delete...");
 					delUser(u,ius, req, resp);
 					break;
 				} else if ("manager".equals(nextElement.toUpperCase())) {
-					System.out.println("managerUser...");
 					managerUser(ius, req, resp);
 					break;
 				} else if ("FORGETPWD".equals(nextElement.toUpperCase())) {
-					System.out.println("forgetPWD...");
 					forgetPWD(ius, req, resp);
 					break;
 				}
@@ -82,7 +77,13 @@ public class UserServlet extends HttpServlet {
 			}
 
 		}
-		// UserUpdate.jsp UserPWDUpdate.jsp
+		// /MusicBlog/WebContent/resources/user/pic/4d245.jpg
+	}
+
+
+	private void updatePWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
+		User u = new User();
+		ius.update(u);
 	}
 
 	private void forgetPWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
@@ -101,7 +102,6 @@ public class UserServlet extends HttpServlet {
 							try {
 								boolean bool  = rememberMe(u.getId().toString(), pwd,rememberMe,cookies, ius, req, resp);
 								if(bool) {
-									System.out.println("bool:"+bool);
 									req.getRequestDispatcher("/UserLogin.jsp").forward(req, resp);
 									return;
 								}
@@ -116,6 +116,8 @@ public class UserServlet extends HttpServlet {
 					String ukey = u.getId()+u.getAccount();
 					req.getSession().setAttribute(ukey, u);
 					req.getSession().setAttribute("ukey", ukey);
+					System.out.println("ukey:"+ukey);
+					System.out.println(req.getSession().getAttribute("ukey"));
 					req.getRequestDispatcher("/User.jsp").forward(req, resp);
 					return;
 				} else {
@@ -180,7 +182,6 @@ public class UserServlet extends HttpServlet {
 				}
 			} else {
 				System.out.println("获取账号失败!");
-				out.printf("null", null);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -208,7 +209,6 @@ public class UserServlet extends HttpServlet {
 			}
 		} else {
 			System.out.println("邮箱为空!");
-			out.printf("null", null);
 		}
 	}
 	
@@ -229,7 +229,6 @@ public class UserServlet extends HttpServlet {
 					}
 				} else {
 					System.out.println("获取手机号错误!");
-					out.printf("null", null);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -239,7 +238,6 @@ public class UserServlet extends HttpServlet {
 				System.out.println("手机号为空!");
 				req.setAttribute("null_mobile","ID账号为空!");
 				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-				out.printf("null", null);
 			} catch (ServletException e) {
 				e.printStackTrace();
 			}
@@ -264,7 +262,6 @@ public class UserServlet extends HttpServlet {
 					}
 				} else {
 					System.out.println("获取邮箱错误!");
-					out.printf("null", null);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -274,7 +271,6 @@ public class UserServlet extends HttpServlet {
 				System.out.println("邮箱为空!");
 				req.setAttribute("null_email","ID账号为空!");
 				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-				out.printf("null", null);
 			} catch (ServletException e) {
 				e.printStackTrace();
 			}
@@ -312,7 +308,7 @@ public class UserServlet extends HttpServlet {
 	 */
 	private void managerUser(IUserService us, HttpServletRequest req,HttpServletResponse resp) {
 		try {
-			List<Map<String,Object>> all = us.getAll();
+			List<User> all = us.getAll();
 			System.out.println("all:"+all);
 			req.setAttribute("users", all);
 			req.getRequestDispatcher("/UserManager.jsp").forward(req, resp);
@@ -322,47 +318,45 @@ public class UserServlet extends HttpServlet {
 	}
 	
 	public void register(IUserService ius,HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		String account = req.getParameter("account");
+//		String account = req.getParameter("account");
 		String email = req.getParameter("email");
 		String mobile = req.getParameter("mobile");
 		User user = new User();
-		PrintWriter out = resp.getWriter();
-		if(account != null && "" != account && account.trim().length() > 0) {
-			checkAccount(req, resp, user,ius,account);
-			return;
-		} else {
-			System.out.println("ID账号为空!");
-			req.setAttribute("id","ID账号为空!");
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-			out.printf("id", null);
-		}
-		if(email != null && "" != email && email.trim().length() > 0) {
-			checkEmail(req, resp, user,ius,email);
-			return;
-		}
-		if(mobile != null && "" != mobile && mobile.trim().length() > 0) {
-			checkMobile(req, resp, user,ius,mobile);
-			return;
-		}
-		if(req.getParameter("pwd") == null || req.getParameter("password") == "") {
-			System.out.println("密码不能为空!");
-			req.setAttribute("pwd", "密码不能为空!");
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-			return;
-		}
-		if(req.getParameter("affirmPwd") == null || req.getParameter("affirmPwd") == "") {
-			System.out.println("确认密码不能为空!");
-			req.setAttribute("affirmPwd", "确认密码不能为空!");
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-			return;
-		}
-		if(!(req.getParameter("pwd").equals(req.getParameter("affirmPwd")))) {
-			System.out.println("两次输入的密码不一样!");
-			req.setAttribute("status", "两次输入的密码不一样!");
-			System.out.println(req.getParameter("pwd") + ",\t" + req.getParameter("affirmPwd"));
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-			return;
-		}
+//		if(account != null && "" != account && account.trim().length() > 0) {
+//			checkAccount(req, resp, user,ius,account);
+//			return;
+//		} else {
+//			System.out.println("ID账号为空!");
+//			req.setAttribute("id","ID账号为空!");
+//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+//		}
+//		if(email != null && "" != email && email.trim().length() > 0) {
+//			checkEmail(req, resp, user,ius,email);
+//			return;
+//		}
+//		if(mobile != null && "" != mobile && mobile.trim().length() > 0) {
+//			checkMobile(req, resp, user,ius,mobile);
+//			return;
+//		}
+//		if(req.getParameter("pwd") == null || req.getParameter("password") == "") {
+//			System.out.println("密码不能为空!");
+//			req.setAttribute("pwd", "密码不能为空!");
+//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+//			return;
+//		}
+//		if(req.getParameter("affirmPwd") == null || req.getParameter("affirmPwd") == "") {
+//			System.out.println("确认密码不能为空!");
+//			req.setAttribute("affirmPwd", "确认密码不能为空!");
+//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+//			return;
+//		}
+//		if(!(req.getParameter("pwd").equals(req.getParameter("affirmPwd")))) {
+//			System.out.println("两次输入的密码不一样!");
+//			req.setAttribute("status", "两次输入的密码不一样!");
+//			System.out.println(req.getParameter("pwd") + ",\t" + req.getParameter("affirmPwd"));
+//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+//			return;
+//		}
 		String name = req.getParameter("name");
 		String pwd = req.getParameter("pwd");
 		if(req.getParameter("email") != ""){
@@ -383,12 +377,12 @@ public class UserServlet extends HttpServlet {
     	//SimpleDateFormat sdf = new SimpleDateFormat("yyyy年第w周,第D天 MM月dd日 星期:F HH:mm:ss");
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 星期:F HH:mm:ss");
 		String date = sdf.format(new Date());
-		user.setRegisterTime(date); //设置注册时间
-		user.setModifyTime(date);	//设置修改时间
+		user.setCreateTime(date); //设置注册时间
+		user.setUpdateTime(date);	//设置修改时间
 		IUserService userService = new UserServiceImpl();
 		try {
-			boolean bool = userService.register(user);
-			if(bool) {
+			Integer num = userService.insert(user);
+			if(num != null && num > 0) {
 				System.out.println("注册成功!");
 				req.setAttribute("msg","注册成功!");
 				req.getRequestDispatcher("UserAddOKMessage.jsp").forward(req, resp);
@@ -494,10 +488,11 @@ public class UserServlet extends HttpServlet {
 		String newPwd = req.getParameter("new");
 		System.out.println(oldPwd);
 		System.out.println(newPwd);
-		Object ur = req.getSession().getAttribute("user");
+		String ur = (String)req.getSession().getAttribute("ukey");
 //		IUserService iu = new UserServiceImpl();
 		if (ur != null) {
-			User u = (User) ur;
+			Object obj = req.getSession().getAttribute(ur);
+			User u = (User)obj;
 			String nickname = req.getParameter("nickname");
 			String signature = req.getParameter("signature");
 			String age = req.getParameter("age");
@@ -538,7 +533,7 @@ public class UserServlet extends HttpServlet {
 			user.setEmail(email);
 			user.setMobile(mobile);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");// yyyy-MM-dd 星期:F HH:mm:ss
-			user.setModifyTime(sdf.format(new Date()));
+			user.setUpdateTime(sdf.format(new Date()));
 			IUserService serviceImpl = new UserServiceImpl();
 //			String sql = "update `user` set `nickname`=?,`signature`=?,`age`=?,`sex`=?,`hobby`=?,`head`=?,`image`=?,`email`=?,`mobile`=? where `name`=? and `password`=?";
 //			Integer rs = null;
@@ -546,8 +541,8 @@ public class UserServlet extends HttpServlet {
 //				result = serviceImpl.commonCUD(sql, user.getNickname(), user.getSignature(), user.getAge(), user.getSex(),
 //						user.getHobby().toString(), user.getHead(), user.getImage(), user.getEmail(), user.getMobile(), user.getName(),
 //						user.getPassword());
-				boolean rs = serviceImpl.update(user);
-				if (rs) {
+				Integer num = serviceImpl.update(user);
+				if (num != null && num > 0) {
 					req.setAttribute("msg", "执行操作成功!欢迎你:" + user.getAccount());
 					req.setAttribute("user", user);
 					req.getRequestDispatcher("/User.jsp").forward(req, resp);

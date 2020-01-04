@@ -1,8 +1,6 @@
 package com.explorer.musicblog.dao;
 
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.User;
@@ -10,16 +8,7 @@ import com.explorer.musicblog.pojo.User;
 /**
  * zhangzhong Sep 18, 2019 4:40:35 AM
  */
-public interface IUserDao extends ICommonDao<User, String, Object> {
-
-	/**
-	 * 用户注册
-	 * 
-	 * @param user
-	 * @throws SQLException 
-	 * @throws CustomException 
-	 */
-	public Integer register(User user) throws Exception;
+public interface IUserDAO extends ICommonDAO<User, String, Object> {
 
 	/**
 	 * 用户登录
@@ -32,43 +21,49 @@ public interface IUserDao extends ICommonDao<User, String, Object> {
 	public User login(String uname,String pwd) throws Exception;
 
 	/**
-	 * 根据ID删除信息
+	 * 	根据ID删除用户信息
 	 * 
 	 * @param id
 	 * @return
-	 * @throws CustomException 
+	 * @throws Exception 
 	 */
 	public Integer delete(Integer id) throws Exception;
 
 	/**
-	 * 根据ID修改信息
+	 * 	根据ID修改信息
 	 * 
-	 * @param t
-	 * @throws CustomException 
+	 * @param user
 	 */
-	public Integer update(User user) throws Exception;
+	public Integer update(User user);
+	
+	/**
+	 * 	修改用户密码
+	 * @param oldpwd 修改之前的密码
+	 * @param user 修改的信息，包括邮箱、手机验证方式
+	 */
+	public Integer updatePWD(String oldpwd,User user);
 
 	/**
-	 * 获取用户数量
+	 * 	获取用户所有个数
 	 * @return
 	 * @throws CustomException
 	 */
 	public Integer getSize() throws CustomException;
 	
 	/**
-	 * 获取所有信息
+	 * 	获取所有信息
 	 * 
 	 * @return
 	 * @throws CustomException 
 	 */
-	public List<Map<String,Object>> getAll() throws Exception;
+	public List<User> getAll();
 
 	/**
-	 * 根据ID查询
+	 * 	根据ID查询
 	 * 
 	 * @param id
 	 * @return
-	 * @throws CustomException 
+	 * @throws Exception 
 	 */
 	public User getById(Integer id) throws Exception;
 

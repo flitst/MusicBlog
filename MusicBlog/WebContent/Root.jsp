@@ -18,8 +18,20 @@
 	</head>
 	<body>
 		<div id="list">
+			<span>${msg}</span>
 			<h3>后台管理</h3>
-			<span>用户数:${num}</span><a href="UserManagerServlet.do?manager=manager">管理用户</a>
+			<p>
+				<span>用户数:${num}</span><a href="UserManagerServlet.do?manager=manager">管理用户</a>
+			</p>
+			<p>
+				<a href="Song.jsp">管理歌曲</a>
+			</p>
+			<p>
+				<a href="Type.jsp">管理歌曲类型</a>
+			</p>
+			<p>
+				<a href="Singer.jsp">管理歌手</a>
+			</p>
 		</div>
 	</body>
 </html>

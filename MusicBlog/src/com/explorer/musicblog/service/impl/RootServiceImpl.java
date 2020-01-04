@@ -1,6 +1,6 @@
 package com.explorer.musicblog.service.impl;
 
-import com.explorer.musicblog.dao.IRootDao;
+import com.explorer.musicblog.dao.IRootDAO;
 import com.explorer.musicblog.dao.impl.RootDaoImpl;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Root;
@@ -12,7 +12,7 @@ import com.explorer.musicblog.service.IRootService;
  */
 public class RootServiceImpl implements IRootService{
 
-	private IRootDao rootDao = new RootDaoImpl();
+	private IRootDAO rootDao = new RootDaoImpl();
 
 	@Override
 	public Root getRoot(String name,String pass) throws CustomException {

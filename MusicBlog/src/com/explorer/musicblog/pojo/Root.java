@@ -6,44 +6,66 @@ package com.explorer.musicblog.pojo;
  */
 public class Root {
 
-	private Integer aid;	//管理员ID
-	private String name;	//管理员名
-	private String pass;	//密码
-
-	public Root() {}
+	private Integer aid;	   // 管理员ID
+	private String name;	   // 账号
+	private String pass;   	   // 密码
+	private String createTime; // 创建时间
+	private String updateTime; // 修改时间
 	
-	public Root(Integer aid, String name,String pass) {
-		this.aid 	 = aid;
-		this.name = name;
-		this.pass = pass;
-	}
+	public Root() {}
 
-	@Override
-	public String toString() {
-		return "Admin [aid=" + aid + ", name=" + name + ", pass=" + pass + "]";
-	}
+    public Root(Integer aid, String name, String pass, String createTime, String updateTime) {
+        super();
+        this.aid = aid;
+        this.name = name;
+        this.pass = pass;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
 
-	public Integer getAid() {
-		return aid;
-	}
+    @Override
+    public String toString() {
+        return "Root [aid=" + aid + ", name=" + name + ", pass=" + pass + ", createTime=" + createTime + ", updateTime="
+                + updateTime + "]";
+    }
 
-	public void setAid(Integer aid) {
-		this.aid = aid;
-	}
+    public Integer getAid() {
+        return aid;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setAid(Integer aid) {
+        this.aid = aid;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getPass() {
-		return pass;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setPass(String pass) {
-		this.pass = pass;
-	}
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
 }

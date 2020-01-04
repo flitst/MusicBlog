@@ -1,16 +1,11 @@
 package com.explorer.musicblog.service;
 
-import java.util.List;
-import java.util.Map;
-
-import com.explorer.musicblog.exception.CustomException;
+import com.explorer.musicblog.pojo.Type;
 
 /**
  * zhangzhong
  * Dec 6, 2019 8:51:49 PM
  */
-public interface ITypeService {
+public interface ITypeService extends ICommonService<Type,String,Object>{
 	
-	List<Map<String,Object>> getType() throws CustomException;
-
 }

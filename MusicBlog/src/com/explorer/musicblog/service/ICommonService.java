@@ -11,6 +11,34 @@ import com.explorer.musicblog.exception.CustomException;
 public interface ICommonService<T, K, V> {
 
 	/**
+	 * 	获取所有
+	 * @return
+	 * @throws CustomException
+	 */
+	List<T> getAll();
+	
+	/**
+	 * 	新增
+	 * @param type
+	 * @return
+	 */
+	public Integer insert(T type);
+	
+	/**
+	 * 	修改
+	 * @param type
+	 * @return
+	 */
+	public Integer update(T type);
+	
+	/**
+	 *	 删除
+	 * @param type
+	 * @return
+	 */
+	public Integer delete(T type);	
+	
+	/**
 	 * 通用新增/删除/修改
 	 * 
 	 * @return

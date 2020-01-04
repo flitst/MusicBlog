@@ -1,6 +1,5 @@
 package com.explorer.musicblog.utils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,6 +19,21 @@ public class DBUtil {
 	public static PreparedStatement ps = null;
 	public static ResultSet rs = null;
 
+	// 给用户调用创建一个唯一实例
+	private static DBUtil instance = null;
+	
+	/**
+	    *   获取实例
+	 * @return
+	 */
+	public static synchronized DBUtil getInstance() {
+	    if (instance == null) {
+	       instance = new DBUtil(); 
+	    }
+	    return instance;
+	}
+	
+	
 	// 获取数据库连接
 	public Connection getConn(){
 		try {

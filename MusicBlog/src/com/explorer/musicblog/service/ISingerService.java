@@ -15,19 +15,19 @@ public interface ISingerService {
 	 * 添加歌手
 	 * @param singer
 	 */
-	public void insert(Singer singer);
+	public Integer insert(Singer singer);
 	
 	/**
 	 * 根据编号或歌手名删除歌手
 	 * @param id
 	 */
-	public void delete(Integer id);
+	public Integer delete(Integer id);
 	
 	/**
 	 * 修改歌手
 	 * @param singer
 	 */
-	public void update(Integer id,Singer singer);
+	public Integer update(Integer id,Singer singer);
 	
 	/**
 	 * 查询所有歌手
@@ -40,7 +40,7 @@ public interface ISingerService {
 	 * @param singer
 	 * @return
 	 */
-	public Singer getSinger(String name);
+	public List<Singer> getSinger(String name);
 	
 	/**
 	 * 根据歌手编号查询

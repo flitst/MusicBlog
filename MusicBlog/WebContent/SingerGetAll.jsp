@@ -1,14 +1,18 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="com.explorer.musicblog.pojo.Singer"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.Iterator"%>
-<%@page import="com.explorer.musicblog.pojo.Singer"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.List"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 	<head>
-	<meta charset="UTF-8">
-	<title>歌手</title>
+		<meta charset="UTF-8">
+		<title>歌手</title>
+		<style type="text/css">
+			table{border-collapse:collapse;}
+			table,tr,th,td{border:1px solid blue}
+		</style>
 	</head>
 	<body>
 		<a href="<%=request.getContextPath()%>/SingerServlet.do?getAll">查询</a>
@@ -26,6 +30,7 @@
 				</tr>
 			</thead>
 			<%
+				@SuppressWarnings("unchecked")
 				List<Map<String,Singer>> list = (List<Map<String,Singer>>)request.getAttribute("all"); 
 				if(list != null && list.size() > 0){
 					Singer singer = null;
@@ -47,6 +52,8 @@
 					<td><%=singer.getSex()%></td>
 					<td><%=singer.getHead()%></td>
 					<td><%=singer.getImage()%></td>
+					<td><%=singer.getAddTime()%></td>
+					<td><%=singer.getUpdateTime()%></td>
 				</tr>
 			</tbody>
 			<% 

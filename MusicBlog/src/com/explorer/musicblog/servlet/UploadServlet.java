@@ -22,6 +22,7 @@ import com.explorer.musicblog.pojo.Song;
  */
 @WebServlet("/UploadServlet.do")
 public class UploadServlet extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
        
     // 上传配置
@@ -33,11 +34,11 @@ public class UploadServlet extends HttpServlet {
     private final String UPLOAD_DIRECTORY;
 
     public UploadServlet(){
-    	this.UPLOAD_DIRECTORY = "upload";
+    	this.UPLOAD_DIRECTORY = "D:\\Java\\Tomcat\\apache-tomcat-9.0.0.M26\\upload";
     }
     
     public UploadServlet(String directory){
-    	this.UPLOAD_DIRECTORY = "upload\\" + directory;
+    	this.UPLOAD_DIRECTORY = "D:\\Java\\Tomcat\\apache-tomcat-9.0.0.M26\\upload\\" + directory;
     }
     
 	@Override
@@ -70,8 +71,8 @@ public class UploadServlet extends HttpServlet {
         upload.setHeaderEncoding("UTF-8"); 
 
         // 构造临时路径来存储上传的文件
-        // 这个路径相对当前应用的目录
-        String uploadPath = request.getServletContext().getRealPath("/") + File.separator + UPLOAD_DIRECTORY;
+        // 这个路径相对当前应用的目录 request.getServletContext().getRealPath("/") + File.separator + 
+        String uploadPath = UPLOAD_DIRECTORY;
        
          
         // 如果目录不存在则创建
@@ -83,14 +84,12 @@ public class UploadServlet extends HttpServlet {
         try {
             // 解析请求的内容提取文件数据
             List<FileItem> formItems = upload.parseRequest(request);
-            System.out.println("formItems:"+formItems);
             if (formItems != null && formItems.size() > 0) {
                 // 迭代表单数据
                 for (FileItem item : formItems) {
                     // 处理不在表单中的字段
                     if (!item.isFormField()) {
                         String fileName = new File(item.getName()).getName();
-                        System.out.println("fileName:"+fileName);
                         Song song = new Song();
                         song.setName(fileName);
                         String filePath = uploadPath + File.separator + fileName;

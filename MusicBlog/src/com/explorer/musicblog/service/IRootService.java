@@ -17,4 +17,10 @@ public interface IRootService {
 	 * @throws CustomException 
 	 */
 	public Root getRoot(String name, String pass) throws CustomException;
+
+	/**
+	 * 联系站长
+	 * @param value
+	 */
+	public Integer contactTheWebmaster(String value);
 }

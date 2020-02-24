@@ -21,6 +21,7 @@ public class CounterServlet extends HttpServlet {
 
 	//写入站点访问次数文件
 	public static void writeFile(String fileName,int count) {
+		System.out.println("fileName:"+fileName+" count:"+count);
 		try {
 			PrintWriter out = new PrintWriter(new FileWriter(fileName));
 			out.println(count);
@@ -32,6 +33,7 @@ public class CounterServlet extends HttpServlet {
 	
 	//读取站点访问次数文件
 	public static int readFile(String fileName) {
+		System.out.println("fileName:"+fileName);
 		File file = new File(fileName);
 		int count = 0;
 		if(!file.exists()) {

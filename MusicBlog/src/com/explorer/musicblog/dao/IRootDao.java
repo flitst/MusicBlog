@@ -17,4 +17,11 @@ public interface IRootDao {
 	 * @throws CustomException 
 	 */
 	public Root getRoot(String name,String pass) throws CustomException;
+
+	/**
+	 * 联系站长
+	 * @param value
+	 * @return
+	 */
+	public Integer contactTheWebmaster(String value);
 }

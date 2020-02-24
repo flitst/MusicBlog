@@ -10,9 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.explorer.musicblog.pojo.Lyric;
-import com.explorer.musicblog.pojo.Singer;
 import com.explorer.musicblog.pojo.Song;
-import com.explorer.musicblog.pojo.Type;
+import com.explorer.musicblog.pojo.SongType;
 import com.explorer.musicblog.service.ISongService;
 import com.explorer.musicblog.service.impl.ServiceFactory;
 
@@ -31,67 +30,76 @@ public class SongServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		String song = req.getParameter("song");
 		System.out.println("song:"+song);
-		ISongService sf = ServiceFactory.getSongService();
-		if(song != null && !"".equals(song.trim())) {
-			switch(song.toUpperCase()) {
-				case "ADD":
-					addSong(sf,req,res);
-					break;
-				case "UPDATE":
-					updateSong(sf,req,res);
-					break;
-				case "GETALL":
-					getAllSong(sf,req,res);
-					break;
-				case "GETBYNAME":
-					getByName(sf,req,res);
-					break;
-					
+		ISongService songService = ServiceFactory.getSongService();
+		if(song != null){
+			switch(song) {
+				case "add":
+					addSong(songService,req,res);
+					return;
+				case "update":
+					updateSong(songService,req,res);
+					return;
+				case "all":
+					getAllSong(songService,req,res);
+					return;
+				case "name":
+					getByName(songService,req,res);
+					return;
+				default :
+					System.out.println("没有可执行的操作！");
 			}
 		}
+		req.getRequestDispatcher("/MusicBlog/WEB-INF/404.jsp").forward(req, res);
 	}
 
 	private void getByName(ISongService sf, HttpServletRequest req, HttpServletResponse res) {
-		String name = req.getParameter("search");
-		if(name != null && !"".equals(name)) {
-			List<Song> songs = sf.getByName(0,name);
+		String keyword = req.getParameter("search");
+		if (keyword != null && !"".equals(keyword.trim())) {
+			List<Song> songs = sf.getByName(0,keyword);
 			System.out.println("songs:"+songs);
-			req.getSession().setAttribute("songs", songs);
-			try {
-				req.getRequestDispatcher("index.jsp").forward(req, res);
-			} catch (ServletException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
+			String name = req.getParameter("name");
+			if(name != null && "".equals(name.trim())) {
+				req.setAttribute("name", keyword);
 			}
+			req.setAttribute("songs", songs);
+		} else {
+			req.setAttribute("keyword", keyword);
 		}
-	}
-	private void getAllSong(ISongService sf, HttpServletRequest req, HttpServletResponse res) {
-		List<Song> all = sf.getAll();
-		System.out.println("all:"+all);
-		req.getSession().setAttribute("all", all);
 		try {
-			req.getRequestDispatcher("ShowAllSong.jsp").forward(req, res);
+			req.getRequestDispatcher("index.jsp").forward(req, res);
 		} catch (ServletException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	private void getAllSong(ISongService sf, HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		List<Song> all = sf.getAll();
+		System.out.println("all:"+all);
+		req.setAttribute("all", all);
+		req.getRequestDispatcher("/WEB-INF/song/Song.jsp").forward(req, res);
+	}
 
 	private void addSong(ISongService sf,HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		String song = req.getParameter("file");
+		System.out.println("song:"+song);
+		if (song != null) {
+			System.out.println("...");
+			return ;
+		}
 		String name = req.getParameter("name");
 		String singer = req.getParameter("singer");
 		String lyric = req.getParameter("lyric");
 		String type = req.getParameter("type");
-		String length = req.getParameter("length");
-		System.out.println("name"+name);
-		System.out.println("singer"+singer);
-		System.out.println("lyric"+lyric);
-		System.out.println("type"+type);
-		System.out.println("length"+length);
+		String createTime = req.getParameter("createtime");
+		String updateTime = req.getParameter("updatetime");
+		System.out.println("name:"+name);
+		System.out.println("singer:"+singer);
+		System.out.println("lyric:"+lyric);
+		System.out.println("type:"+type);
 		if(name != null && !"".equals(name.trim()) && singer != null && !"".equals(singer.trim()) && lyric != null && !"".equals(lyric.trim())
-				&& type != null && !"".equals(type.trim()) && length != null && !"".equals(length.trim())) {
+				&& type != null && !"".equals(type.trim()) && createTime != null && !"".equals(createTime.trim())
+				&& updateTime != null && !"".equals(updateTime.trim())) {
 			Song s = new Song();
 			String str = type.substring(0, 1);
 			System.out.println(str);
@@ -99,16 +107,17 @@ public class SongServlet extends HttpServlet {
 				s.setId(Integer.parseInt(str));
 			}
 			s.setName(name);
-			Singer sin = new Singer();
+			//Singer sin = new Singer();
 //			sin.setName(singer);
 //			s.setSinger(sin);
 			Lyric l = new Lyric();
 			l.setLyric(lyric);
 //			s.setLyric(l);
-			Type t = new Type();
-			t.setName(type);
+			SongType t = new SongType();
+			t.setType(type);
 //			s.setType(t);
-			s.setLength(length);
+			s.setCreateTime(createTime);
+			s.setUpdateTime(updateTime);
 			System.out.println("song:"+s);
 			UploadServlet us = new UploadServlet(s.getName());
 			us.doGet(req, res);

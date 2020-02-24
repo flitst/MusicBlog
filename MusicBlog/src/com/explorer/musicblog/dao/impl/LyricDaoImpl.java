@@ -12,7 +12,7 @@ import java.util.Map;
 import com.explorer.musicblog.dao.ILyricDao;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Lyric;
-import com.explorer.musicblog.utils.DBUtil;
+import com.explorer.musicblog.util.DBUtils;
 
 /**
  * zhangzhong
@@ -23,18 +23,50 @@ public class LyricDaoImpl implements ILyricDao {
 	private Connection conn = null;
 	private PreparedStatement ps = null;
 	private ResultSet rs = null;
+	
+	@Override
+	public List<Lyric> getByName(String name) {
+		String sql = "select * from `t_document` where title like %?% or body like %?%";
+		DBUtils db = new DBUtils();
+		conn = db.getConnection();
+		List<Lyric> lyrics = new ArrayList<>();
+		try {
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, name);
+			ps.setString(2, name);
+			rs = ps.executeQuery();
+			System.out.println(db.printSQL(ps,"根据歌词名获取歌词"));
+			Lyric lyric = null;
+			while (rs.next()) {
+				lyric = new Lyric();
+				lyric.setId(rs.getInt("id"));
+				lyric.setSong(rs.getString("song"));
+				lyric.setLyric(rs.getString("lyric"));
+				lyric.setSinger(rs.getString("singer"));
+				lyric.setContent(rs.getString("content"));
+				lyric.setCreateTime(rs.getString("create_time"));
+				lyric.setUpdateTime(rs.getString("update_time"));
+				lyrics.add(lyric);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return lyrics;
+	}
+
+	
 	@Override
 	public Integer renew(String sql, Object... args){
 		if (sql != null && !"".equals(sql.trim()) && args.length >= 0) {
-			DBUtil db = new DBUtil();
+			DBUtils db = new DBUtils();
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
 			}
 			try {
 				ps = conn.prepareStatement(sql);
-				System.out.println("sql:"+ps);
+				System.out.println(db.printSQL(ps,"通用增/删/改"));
 				for (int i = 1; i <= args.length; i++) {
 					ps.setObject(i, args[i-1]);
 				}
@@ -54,22 +86,22 @@ public class LyricDaoImpl implements ILyricDao {
 	@Override
 	public List<Map<String, Object>> get(List<Map<String, Object>> params){
 		if(params != null && params.size() > 0) {
-			StringBuffer sb = new StringBuffer("select * from `tb_lyric` where 1=1");
+			StringBuffer sb = new StringBuffer("select * from `t_lyric` where 1=1");
 			for (int i = 0; i < params.size(); i++) {
 				Map<String, Object> map = params.get(i);
 				sb.append(" and "+map.get("param")+map.get("pattern")+map.get("value"));
 			}
 			System.out.println("sb:" + sb.toString());
-			DBUtil db = new DBUtil();
+			DBUtils db = new DBUtils();
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
 			}
 			if(conn != null) {
 				try {
 					ps = conn.prepareStatement(sb.toString());
-					System.out.println("sql:" + ps);
+					System.out.println(db.printSQL(ps,"获取歌词"));
 					ResultSet rs = ps.executeQuery();
 					List<Map<String, Object>> lyrics = new ArrayList<Map<String, Object>>();
 					HashMap<String, Object> lyric = new HashMap<String, Object>();
@@ -97,6 +129,47 @@ public class LyricDaoImpl implements ILyricDao {
 				}
 			}
 		}
+		return null;
+	}
+
+	@Override
+	public List<Lyric> getAll() {
+		return null;
+	}
+
+	@Override
+	public Integer insert(Lyric type) {
+		return null;
+	}
+
+	@Override
+	public Integer update(Lyric type) {
+		return null;
+	}
+
+	@Override
+	public Integer delete(Lyric type) {
+		return null;
+	}
+
+
+	@Override
+	public Integer getSize() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Integer delete(Integer id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Lyric getById(Integer id) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

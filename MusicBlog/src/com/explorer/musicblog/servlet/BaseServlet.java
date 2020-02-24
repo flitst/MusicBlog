@@ -1,8 +1,7 @@
 package com.explorer.musicblog.servlet;
 
-import java.io.IOException;
+import java.lang.reflect.Method;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,20 +9,23 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * 所有请求由这个Servlet接收
  */
-//@WebServlet(name = "/BaseServlet",urlPatterns = "/*")
 public class BaseServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 	
-	public BaseServlet() {
-		super();
-		System.out.println("BaseServlet...");
-	}
+	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		super.service(req, resp);
-		req.setCharacterEncoding("UTF-8");
-		resp.setCharacterEncoding("UTF-8");
-		resp.setContentType("text/html;charset=UTF-8");
+	protected void service(HttpServletRequest req, HttpServletResponse resp){
+		try {
+			String params = req.getParameter("params");
+			System.out.println("params:"+params);
+			if (params != null) {
+				Class<?> clazz = this.getClass();
+				Method method = clazz.getDeclaredMethod(params,HttpServletRequest.class, HttpServletResponse.class);
+				method.setAccessible(true);
+				method.invoke(this,req,resp);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

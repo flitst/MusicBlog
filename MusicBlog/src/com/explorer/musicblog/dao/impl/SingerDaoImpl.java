@@ -12,7 +12,7 @@ import java.util.Map;
 import com.explorer.musicblog.dao.ISingerDao;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Singer;
-import com.explorer.musicblog.utils.DBUtil;
+import com.explorer.musicblog.util.DBUtils;
 
 /**
  * @author :zhangzhong 创建时间 :2018年5月27日下午5:15:52
@@ -20,106 +20,110 @@ import com.explorer.musicblog.utils.DBUtil;
 public class SingerDaoImpl implements ISingerDao {
 
 	Connection conn = null;
-	PreparedStatement pstmt = null;
+	PreparedStatement ps = null;
 	ResultSet rs = null;
+	DBUtils db = new DBUtils();
 
 	@Override
-	public void insert(Singer singer) {
-		String sql = "insert into singer(name,sex,age,head,image,addTime,updateTime) values (?,?,?,?,?,?,?)";
-		DBUtil db = new DBUtil();
+	public Integer insert(Singer singer) {
+		String sql = "insert into `singer`(`name`,`sex`,`age`,`head`,`image`,`create_time`,`update_time`) values (?,?,?,?,?,?,?)";
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, singer.getName());
-			pstmt.setObject(2, singer.getSex());
-			pstmt.setInt(3, singer.getAge());
-			pstmt.setString(4, singer.getHead());
-			pstmt.setString(5, singer.getImage());
-			pstmt.setString(6, singer.getAddTime());
-			pstmt.setString(7, singer.getUpdateTime());
-			pstmt.executeUpdate();
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, singer.getName());
+			ps.setObject(2, singer.getSex());
+			ps.setInt(3, singer.getAge());
+			ps.setString(4, singer.getHead());
+			ps.setString(5, singer.getImage());
+			ps.setString(6, singer.getCreateTime());
+			ps.setString(7, singer.getUpdateTime());
+			System.out.println(db.printSQL(ps,"新增歌手"));
+			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void delete(Integer id) {
-		String sql = "delete from `singer` where id = ?";
-		DBUtil db = new DBUtil();
+	public Integer delete(Integer id) {
+		String sql = "delete from `singer` where `id` = ?";
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, id);
-			pstmt.executeUpdate();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			System.out.println(db.printSQL(ps,"删除歌手"));
+			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void update(Integer id, Singer singer) {
-		String sql = "update `singer` set `name`=?,`sex`=?,`age`=?,`head`=?,`image`=?,`updateTime`=? where `id`=?";
-		DBUtil db = new DBUtil();
+	public Integer update(Integer id, Singer singer) {
+		String sql = "update `singer` set `name`=?,`sex`=?,`age`=?,`head`=?,`image`=?,`update_time`=? where `id`=?";
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, singer.getName());
-			pstmt.setObject(2, singer.getSex());
-			pstmt.setInt(3, singer.getAge());
-			pstmt.setString(4, singer.getHead());
-			pstmt.setString(5, singer.getImage());
-			pstmt.setString(6, singer.getUpdateTime());
-			pstmt.setInt(7, singer.getId());
-			pstmt.executeUpdate();
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, singer.getName());
+			ps.setObject(2, singer.getSex());
+			ps.setInt(3, singer.getAge());
+			ps.setString(4, singer.getHead());
+			ps.setString(5, singer.getImage());
+			ps.setString(6, singer.getUpdateTime());
+			ps.setInt(7, singer.getId());
+			System.out.println(db.printSQL(ps,"修改歌手"));
+			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
 		}
+		return null;
 	}
 
 	@Override
 	public List<Map<String,Singer>> getAllSinger() {
 		String sql = "select * from `singer`";
-		DBUtil db = new DBUtil();
 		List<Map<String,Singer>> singers = null;
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
+			ps = conn.prepareStatement(sql);
+			System.out.println(db.printSQL(ps,"获取所有歌手"));
+			rs = ps.executeQuery();
 			Singer singer = null;
 			singers = new ArrayList<Map<String,Singer>>();
 			while (rs.next()) {
@@ -130,8 +134,8 @@ public class SingerDaoImpl implements ISingerDao {
 				singer.setAge(rs.getByte("age"));
 				singer.setHead(rs.getString("head"));
 				singer.setImage(rs.getString("image"));
-				singer.setAddTime(rs.getString("addTime"));
-				singer.setUpdateTime(rs.getString("updateTime"));
+				singer.setCreateTime(rs.getString("create_time"));
+				singer.setUpdateTime(rs.getString("update_time"));
 				Map<String, Singer> map =  new HashMap<String, Singer>();
 				map.put(singer.getId().toString(),singer);
 				singers.add(map);
@@ -140,7 +144,7 @@ public class SingerDaoImpl implements ISingerDao {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -149,19 +153,59 @@ public class SingerDaoImpl implements ISingerDao {
 	}
 
 	@Override
-	public Singer getSinger(String name) {
-		String sql = "select * from `singer` where `name` like %"+name+"%";
+	public List<Singer> getByName(String name) {
+		String sql = "select * from `singer` where `name` like ?";
 		Singer sin = null;
-		DBUtil db = new DBUtil();
+		List<Singer> singers = null;
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			System.out.println(sql);
-			rs = pstmt.executeQuery();
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, "%"+name+"%");
+			System.out.println(db.printSQL(ps,"根据歌手名获取歌手"));
+			rs = ps.executeQuery();
+			singers = new ArrayList<Singer>();
+			while (rs.next()) {
+				sin = new Singer();
+				sin.setId(rs.getInt("id"));
+				sin.setName(rs.getString("name"));
+				sin.setSex(rs.getByte("sex"));
+				sin.setAge(rs.getByte("age"));
+				sin.setHead(rs.getString("head"));
+				sin.setImage(rs.getString("image"));
+				sin.setCreateTime(rs.getString("create_time"));
+				sin.setUpdateTime(rs.getString("update_time"));
+				singers.add(sin);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				db.close(rs, ps, conn);
+			} catch (CustomException e) {
+				e.printStackTrace();
+			}
+		}
+		return singers;
+	}
+
+	@Override
+	public Singer getById(Integer id) {
+		Singer sin = null;
+		String sql = "select * from `singer` where `id` = ?";
+		try {
+			try {
+				conn = db.getConnection();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			System.out.println(db.printSQL(ps,"根据歌手ID获取歌手"));
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				sin = new Singer();
 				sin.setName(rs.getString("name"));
@@ -169,14 +213,14 @@ public class SingerDaoImpl implements ISingerDao {
 				sin.setAge(rs.getByte("age"));
 				sin.setHead(rs.getString("head"));
 				sin.setImage(rs.getString("image"));
-				sin.setAddTime(rs.getString("addTime"));
-				sin.setUpdateTime(rs.getString("updateTime"));
+				sin.setCreateTime(rs.getString("create_time"));
+				sin.setUpdateTime(rs.getString("update_time"));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -185,38 +229,51 @@ public class SingerDaoImpl implements ISingerDao {
 	}
 
 	@Override
-	public Singer getSingerById(Integer id) {
-		Singer sin = null;
-		String sql = "select * from singer where id = ?";
-		DBUtil db = new DBUtil();
-		try {
-			try {
-				conn = db.getConn();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, id);
-			rs = pstmt.executeQuery();
-			while (rs.next()) {
-				sin = new Singer();
-				sin.setName(rs.getString("name"));
-				sin.setSex(rs.getByte("sex"));
-				sin.setAge(rs.getByte("age"));
-				sin.setHead(rs.getString("head"));
-				sin.setImage(rs.getString("image"));
-				sin.setAddTime(rs.getString("addTime"));
-				sin.setUpdateTime(rs.getString("updateTime"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				db.close(rs, pstmt, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+	public Integer update(Singer type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer delete(Singer type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer renew(String sql, Object... args) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Singer> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer getSize() throws Exception {
+		String sql = "select count(*) from `singer`";
+		conn = db.getConnection();
+		ps = conn.prepareStatement(sql);
+		rs = ps.executeQuery();
+		Integer num = null;
+		while (rs.next()) {
+			num = rs.getInt(1);
 		}
-		return sin;
+		return num;
+	}
+
+	@Override
+	public List<Map<String, Object>> query(Class<Singer> clazz, String sql, Object... args) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Map<String, Object>> get(List<Map<String, Object>> params) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

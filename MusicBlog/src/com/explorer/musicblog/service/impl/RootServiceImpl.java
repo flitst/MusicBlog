@@ -18,4 +18,9 @@ public class RootServiceImpl implements IRootService{
 	public Root getRoot(String name,String pass) throws CustomException {
 		return rootDao.getRoot(name, pass);
 	}
+
+	@Override
+	public Integer contactTheWebmaster(String value) {
+		return rootDao.contactTheWebmaster(value);
+	}
 }

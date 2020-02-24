@@ -19,8 +19,6 @@ import javax.servlet.http.HttpSession;
 @WebFilter(urlPatterns = "/*",filterName = "CommonFilter")
 public class CommonFilter implements Filter {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
@@ -29,18 +27,14 @@ public class CommonFilter implements Filter {
 		req.setCharacterEncoding("UTF-8");
 		resp.setCharacterEncoding("UTF-8");
 		resp.setContentType("text/html;charset=UTF-8");
-		System.out.println("begin doFilter()...");
 		HttpSession session = req.getSession();
 		if(session != null) {
 			System.out.println(">>> session");
 			chain.doFilter(req, resp);
 			System.out.println("session >>>");
 		} else {
-			System.out.println("index >>>");
-			System.out.println(req.getServletContext()+"/index.jsp");
 			resp.sendRedirect(req.getServletContext()+"/index.jsp");
 		}
-		System.out.println("end doFilter()...");
 	}
 
 }

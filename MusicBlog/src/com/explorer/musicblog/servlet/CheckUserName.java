@@ -1,6 +1,8 @@
 package com.explorer.musicblog.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.User;
 import com.explorer.musicblog.service.ICommonService;
+import com.explorer.musicblog.service.IUserService;
 import com.explorer.musicblog.service.impl.UserServiceImpl;
 
 /**
@@ -59,5 +62,81 @@ public class CheckUserName extends HttpServlet {
 			}
 		}
 	}
-
+	@SuppressWarnings("unused")
+	private void get(String name, String pass, User user, IUserService ius, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		HashMap<String, Object> hashMap = new HashMap<String, Object>();
+		hashMap.put("param", "name");
+		hashMap.put("pattern", "=");
+		hashMap.put("value", "'" + name + "'");
+		list.add(hashMap);
+		hashMap = new HashMap<String, Object>();
+		hashMap.put("param", "password");
+		hashMap.put("pattern", "=");
+		hashMap.put("value", "'" + pass + "'");
+		list.add(hashMap);
+		for (Map<String, Object> map : list) {
+			System.out.print("param:"+map.get("param")+"\t");
+			System.out.print("pattern:"+map.get("pattern")+"\t");
+			System.out.println("value:"+map.get("value"));				
+		}
+		List<Map<String, Object>> users = null;
+		users = ius.get(list);
+		for (int i = 0; i < users.size(); i++) {
+			Map<String, Object> map = users.get(i);
+			Object object = map.get("1");
+			User u = (User) object;
+			user.setId(u.getId());
+			user.setAccount(u.getAccount());
+			if (null != u.getNickname()) {
+				user.setNickname(u.getNickname());
+			} else {
+				user.setNickname("暂无昵称");
+			}
+			if (null != u.getSignature()) {
+				user.setSignature(u.getSignature());
+			} else {
+				user.setSignature("暂无签名");
+			}
+			if (1 == u.getSex()) {
+				user.setSex((byte)1);
+			} else if (2 == u.getSex()) {
+				user.setSex((byte)2);
+			} else {
+				user.setSex((byte)0);
+			}
+			user.setAge(u.getAge());
+			String[] hobby = null;
+			if (null != u.getHobby() && u.getHobby().length > 0) {
+				hobby = new String[] { u.getHobby().toString() };
+				user.setHobby(hobby);
+			} else {
+				hobby = new String[] { "暂无爱好" };
+				user.setHobby(hobby);
+			}
+			if (null != u.getHead()) {
+				user.setHead(u.getHead());
+			} else {
+				user.setHead("暂无头像");
+			}
+			if (null != u.getImage()) {
+				user.setImage(u.getImage());
+			} else {
+				user.setImage("暂无图片");
+			}
+			if (null != u.getEmail()) {
+				user.setEmail(u.getEmail());
+			} else {
+				user.setEmail("暂无邮箱");
+			}
+			if (null != u.getMobile()) {
+				user.setMobile(u.getMobile());
+			} else {
+				user.setMobile("暂无手机");
+			}
+			user.setCreateTime(u.getCreateTime());
+		}
+		req.setAttribute("user", user);
+		req.getRequestDispatcher("User.jsp").forward(req, resp);
+	}
 }

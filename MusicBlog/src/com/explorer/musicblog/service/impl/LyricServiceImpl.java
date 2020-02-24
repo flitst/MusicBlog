@@ -15,21 +15,65 @@ import com.explorer.musicblog.service.ILyricService;
  */
 public class LyricServiceImpl implements ILyricService {
 
-	ILyricDao ild = DaoFactory.getLyricDao();
+	ILyricDao lyricDao = DaoFactory.getLyricDao();
+
 	@Override
-	public Integer commonCUD(String sql, Object... args) throws Exception {
-		return ild.renew(sql, args);
+	public List<Lyric> getByName(String name) {
+		return lyricDao.getByName(name);
 	}
 
+	@Override
+	public List<Lyric> getAll() {
+		return lyricDao.getAll();
+	}
+
+	@Override
+	public Integer insert(Lyric type) {
+		return lyricDao.insert(type);
+	}
+
+	@Override
+	public Integer update(Lyric type) {
+		return lyricDao.update(type);
+	}
+
+	@Override
+	public Integer delete(Lyric type) {
+		return lyricDao.delete(type);
+	}
+
+	@Override
+	public Integer commonCUD(String sql, Object... args) throws Exception {
+		return lyricDao.renew(sql, args);
+	}
+	
 	@Override
 	public List<Map<String, Object>> commonQuery(Class<Lyric> clazz, String sql, Object... args)
 			throws CustomException, Exception {
-		return ild.query(clazz, sql, args);
+		return lyricDao.query(clazz, sql, args);
+	}
+	
+	@Override
+	public List<Map<String, Object>> get(List<Map<String, Object>> params) throws CustomException, Exception {
+		return lyricDao.get(params);
 	}
 
 	@Override
-	public List<Map<String, Object>> get(List<Map<String, Object>> params) throws CustomException, Exception {
-		return ild.get(params);
+	public Integer getSize() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Lyric getById(Integer id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer delete(Integer id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

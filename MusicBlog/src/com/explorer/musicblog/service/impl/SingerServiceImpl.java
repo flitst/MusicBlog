@@ -3,7 +3,7 @@ package com.explorer.musicblog.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import com.explorer.musicblog.dao.ISingerDAO;
+import com.explorer.musicblog.dao.ISingerDao;
 import com.explorer.musicblog.dao.impl.DaoFactory;
 import com.explorer.musicblog.pojo.Singer;
 import com.explorer.musicblog.service.ISingerService;
@@ -14,7 +14,7 @@ import com.explorer.musicblog.service.ISingerService;
  */
 public class SingerServiceImpl implements ISingerService{
 
-	private ISingerDAO singerDao = DaoFactory.getSingerDao();
+	private ISingerDao singerDao = DaoFactory.getSingerDao();
 	
 	@Override
 	public Integer insert(Singer singer) {
@@ -22,13 +22,8 @@ public class SingerServiceImpl implements ISingerService{
 	}
 
 	@Override
-	public Integer delete(Integer id) {
+	public Integer delete(Integer id) throws Exception {
 		return singerDao.delete(id);
-	}
-
-	@Override
-	public Integer update(Integer id,Singer singer) {
-		return singerDao.update(id,singer);
 	}
 
 	@Override
@@ -37,13 +32,48 @@ public class SingerServiceImpl implements ISingerService{
 	}
 
 	@Override
-	public List<Singer> getSinger(String name) {
-		return singerDao.getSinger(name);
+	public List<Singer> getByName(String name) {
+		return singerDao.getByName(name);
 	}
 
 	@Override
-	public Singer getSingerById(Integer id) {
-		return singerDao.getSingerById(id);
+	public Singer getById(Integer id) throws Exception {
+		return singerDao.getById(id);
+	}
+
+	@Override
+	public Integer update(Singer type) {
+		return singerDao.update(type);
+	}
+
+	@Override
+	public Integer delete(Singer type) {
+		return singerDao.delete(type);
+	}
+
+	@Override
+	public Integer renew(String sql, Object... args) {
+		return singerDao.renew(sql, args);
+	}
+
+	@Override
+	public List<Singer> getAll() {
+		return singerDao.getAll();
+	}
+
+	@Override
+	public Integer getSize() throws Exception {
+		return singerDao.getSize();
+	}
+
+	@Override
+	public List<Map<String, Object>> query(Class<Singer> clazz, String sql, Object... args) throws Exception {
+		return singerDao.query(clazz, sql, args);
+	}
+
+	@Override
+	public List<Map<String, Object>> get(List<Map<String, Object>> params) {
+		return singerDao.get(params);
 	}
 
 }

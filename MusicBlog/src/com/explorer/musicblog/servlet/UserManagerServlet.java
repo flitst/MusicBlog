@@ -63,7 +63,7 @@ public class UserManagerServlet extends HttpServlet {
 								boolean bool  = rememberMe(u.getId().toString(), pwd,rememberMe,cookies, ius, req, resp);
 								if(bool) {
 									System.out.println("bool:"+bool);
-									req.getRequestDispatcher("/UserLogin.jsp").forward(req, resp);
+									req.getRequestDispatcher("/user/UserLogin.jsp").forward(req, resp);
 									return;
 								}
 							} catch (CustomException e) {
@@ -75,7 +75,7 @@ public class UserManagerServlet extends HttpServlet {
 					System.out.println("登录成功! 欢迎您:"+u.getAccount());
 					req.setAttribute("msg", "登录成功! 欢迎您:"+u.getAccount());
 					req.getSession().setAttribute("user", u);
-					req.getRequestDispatcher("/User.jsp").forward(req, resp);
+					req.getRequestDispatcher("/user/User.jsp").forward(req, resp);
 					return;
 				} else {
 					System.out.println("用户名或密码错误!");
@@ -90,7 +90,7 @@ public class UserManagerServlet extends HttpServlet {
 			System.out.println("用户名或密码不能为空!");
 			req.setAttribute("msg", "用户名或密码不能为空!");
 		}
-		req.getRequestDispatcher("/UserLogin.jsp").forward(req, resp);
+		req.getRequestDispatcher("/user/UserLogin.jsp").forward(req, resp);
 	}
 
 	private boolean rememberMe(String id,String pwd,String rememberMe,Cookie[] cookies,IUserService ius, HttpServletRequest req, HttpServletResponse resp)throws CustomException, Exception {
@@ -134,7 +134,7 @@ public class UserManagerServlet extends HttpServlet {
 		} else {
 			System.out.println("ID账号为空!");
 			req.setAttribute("null_id","ID账号为空!");
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+			req.getRequestDispatcher("/user/UserRegister.jsp").forward(req, resp);
 		}
 		if(email != null && "" != email && email.trim().length() > 0) {
 			checkEmail(req, resp, user,iu,email);
@@ -147,20 +147,20 @@ public class UserManagerServlet extends HttpServlet {
 		if(req.getParameter("pwd") == null || req.getParameter("password") == "") {
 			System.out.println("密码不能为空!");
 			req.setAttribute("null_pwd", "密码不能为空!");
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+			req.getRequestDispatcher("/user/UserRegister.jsp").forward(req, resp);
 			return;
 		}
 		if(req.getParameter("affirmPwd") == null || req.getParameter("affirmPwd") == "") {
 			System.out.println("确认密码不能为空!");
 			req.setAttribute("null_affirmPwd", "确认密码不能为空!");
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+			req.getRequestDispatcher("/user/UserRegister.jsp").forward(req, resp);
 			return;
 		}
 		if(!(req.getParameter("pwd").equals(req.getParameter("affirmPwd")))) {
 			System.out.println("两次输入的密码不一样!");
 			req.setAttribute("status", "两次输入的密码不一样!");
 			System.out.println(req.getParameter("pwd") + ",\t" + req.getParameter("affirmPwd"));
-			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+			req.getRequestDispatcher("/user/UserRegister.jsp").forward(req, resp);
 			return;
 		}
 		String name = req.getParameter("name");
@@ -178,9 +178,9 @@ public class UserManagerServlet extends HttpServlet {
 		}
 		user.setAccount(name);
 		if(age != "" && age != null) {
-			user.setAge(Byte.parseByte(age));
+			user.setAge(Short.parseShort(age));
 		} else {
-			user.setAge((byte)18);
+			user.setAge((short)18);
 		}
 		if("MAN".equalsIgnoreCase(sex)){
 			user.setSex((byte)1);
@@ -208,11 +208,11 @@ public class UserManagerServlet extends HttpServlet {
 			if(num != null && num > 0) {
 				System.out.println("注册成功!");
 				req.setAttribute("msg","注册成功!");
-				req.getRequestDispatcher("UserAddOKMessage.jsp").forward(req, resp);
+				req.getRequestDispatcher("/user/UserAddOKMessage.jsp").forward(req, resp);
 			} else {
 				System.out.println("注册失败!");
 				req.setAttribute("msg","注册失败!");
-				req.getRequestDispatcher("UserAddErrorMessage.jsp").forward(req, resp);
+				req.getRequestDispatcher("/user/UserAddErrorMessage.jsp").forward(req, resp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -222,7 +222,7 @@ public class UserManagerServlet extends HttpServlet {
 	private String checkAccount(HttpServletRequest req, HttpServletResponse resp,User user,IUserService iu,String account) throws IOException {
 		PrintWriter out = resp.getWriter();
 		try {
-			User u = iu.getUser(user);
+			User u = iu.checkUser(user);
 			if(u != null) {
 				if(u.getId() != null && !account.equals(u.getAccount())) {
 					System.out.println("可以注册!");
@@ -247,7 +247,7 @@ public class UserManagerServlet extends HttpServlet {
 			user.setEmail(email);
 			User u = null;
 			try {
-				u = iu.getUser(user);
+				u = iu.checkUser(user);
 				if(u != null) {
 					if(u.getEmail() != null && email.equals(u.getEmail())) {
 						System.out.println("此邮箱已注册!");
@@ -266,7 +266,7 @@ public class UserManagerServlet extends HttpServlet {
 			try {
 				System.out.println("邮箱为空!");
 				req.setAttribute("null_email","ID账号为空!");
-				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+				req.getRequestDispatcher("/user/UserRegister.jsp").forward(req, resp);
 			} catch (ServletException e) {
 				e.printStackTrace();
 			}
@@ -279,7 +279,7 @@ public class UserManagerServlet extends HttpServlet {
 			user.setMobile(mobile);
 			User u = null;
 			try {
-				u = iu.getUser(user);
+				u = iu.checkUser(user);
 				if(u != null) {
 					if(u.getMobile() != null && mobile.equals(u.getMobile())) {
 						System.out.println("此手机号已注册!");
@@ -298,7 +298,7 @@ public class UserManagerServlet extends HttpServlet {
 			try {
 				System.out.println("手机号为空!");
 				req.setAttribute("null_mobile","ID账号为空!");
-				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
+				req.getRequestDispatcher("/user/UserRegister.jsp").forward(req, resp);
 			} catch (ServletException e) {
 				e.printStackTrace();
 			}
@@ -315,13 +315,13 @@ public class UserManagerServlet extends HttpServlet {
 		if(id != null && !"".equals(id.trim())) {
 			try {
 				int delId = Integer.parseInt(id);
-				boolean bool = us.delete(delId);
-				if(bool) {
+				Integer delete = us.delete(delId);
+				if(delete != null && delete > 0) {
 					req.setAttribute("msg","删除用户成功!");
-					req.getRequestDispatcher("UserDel.jsp").forward(req, resp);
+					req.getRequestDispatcher("/user/user/UserDel.jsp").forward(req, resp);
 				}
 				req.setAttribute("msg","删除用户失败!");
-				req.getRequestDispatcher("UserLogin.jsp").forward(req, resp);
+				req.getRequestDispatcher("/user/UserLogin.jsp").forward(req, resp);
 			} catch (CustomException e) {
 				e.getMessage(); 
 			} catch (Exception e) {
@@ -341,7 +341,7 @@ public class UserManagerServlet extends HttpServlet {
 			List<User> all = us.getAll();
 			System.out.println("all:"+all);
 			req.setAttribute("users", all);
-			req.getRequestDispatcher("/UserManager.jsp").forward(req, resp);
+			req.getRequestDispatcher("/user/UserManager.jsp").forward(req, resp);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

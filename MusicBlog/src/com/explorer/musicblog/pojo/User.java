@@ -14,7 +14,7 @@ public class User {
 	private String   pwd; 	 		// 用户密码
 	private String   nickname; 		// 用户昵称
 	private String   signature; 	// 个性签名
-	private Byte  	 age; 		 	// 用户年龄
+	private Short  	 age; 		 	// 用户年龄
 	private Byte  	 sex; 			// 用户性别(0:保密,1:男,2:女')
 	private String[] hobby; 		// 业余爱好
 	private String   head; 		 	// 用户头像
@@ -23,11 +23,13 @@ public class User {
 	private String 	 mobile; 		// 用户邮箱
 	private String   createTime;    // 注册时间
 	private String   updateTime;  	// 修改时间
+	private Byte   	 status;  		// 状态
 
 	public User() {}
-	
-	public User(Integer id, String account, String pwd,String nickname, String signature, Byte age, Byte sex, 
-			String[] hobby, String head, String image, String email, String mobile, String createTime,String updateTime) {
+
+	public User(Integer id, String account, String pwd, String nickname, String signature, Short age, Byte sex,
+			String[] hobby, String head, String image, String email, String mobile, String createTime,
+			String updateTime, Byte status) {
 		super();
 		this.id = id;
 		this.account = account;
@@ -43,16 +45,17 @@ public class User {
 		this.mobile = mobile;
 		this.createTime = createTime;
 		this.updateTime = updateTime;
+		this.status = status;
 	}
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", account=" + account + ", pwd=" + pwd + ", nickname=" + nickname + ", signature=" + signature + ", age="
-				+ age + ", sex=" + sex + ", hobby=" + Arrays.toString(hobby) + ", head="
-				+ head + ", image=" + image + ", email=" + email + ", mobile=" + mobile + ", createTime="
-				+ createTime + ", updateTime=" + updateTime + "]";
+		return "User [id=" + id + ", account=" + account + ", pwd=" + pwd + ", nickname=" + nickname + ", signature="
+				+ signature + ", age=" + age + ", sex=" + sex + ", hobby=" + Arrays.toString(hobby) + ", head=" + head
+				+ ", image=" + image + ", email=" + email + ", mobile=" + mobile + ", createTime=" + createTime
+				+ ", updateTime=" + updateTime + ",status=" + status + "]";
 	}
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -93,11 +96,11 @@ public class User {
 		this.signature = signature;
 	}
 
-	public Byte getAge() {
+	public Short getAge() {
 		return age;
 	}
 
-	public void setAge(Byte age) {
+	public void setAge(Short age) {
 		if (age != null && age > 0 && age < 130) {
 			this.age = age;
 		} else {
@@ -179,6 +182,14 @@ public class User {
 		} else {
 			this.updateTime = new Date().toString();
 		}
+	}
+
+	public Byte getStatus() {
+		return status;
+	}
+
+	public void setStatus(Byte status) {
+		this.status = status;
 	}
 	
 }

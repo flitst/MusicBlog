@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -8,6 +7,7 @@
 	</head>
 	<body>
 		信息:<h3>${msg}</h3>
+		<a href="UploadFiles.jsp">查看我上传的音乐</a>
 		<a href="UploadFiles.jsp">继续上传</a>
 	</body>
 </html>

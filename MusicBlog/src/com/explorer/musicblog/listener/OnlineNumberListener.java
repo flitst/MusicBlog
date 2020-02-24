@@ -1,63 +1,82 @@
 package com.explorer.musicblog.listener;
 
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+
+import com.explorer.musicblog.pojo.SongType;
+import com.explorer.musicblog.service.ISongTypeService;
+import com.explorer.musicblog.service.impl.ServiceFactory;
+import com.explorer.musicblog.servlet.BaseServlet;
 
 /**
  * zhangzhong
  * Nov 19, 2019 7:14:29 PM
- * 实现一个在线人数的功能
+ *	在线人数统计类
  */
-@WebListener(value = "OnlineNumberListener")
-public class OnlineNumberListener extends HttpServlet implements HttpSessionListener,ServletContextListener {
+@WebListener(value = "/OnlineNumberListener")
+public class OnlineNumberListener extends BaseServlet implements HttpSessionListener,ServletContextListener {
 
 	private static final long serialVersionUID = 1L;
-	private static ServletContext sc = null;
-	private static int count = 0;
-	/**
-	 * 当新增一个session在线数量就+1
-	 */
-    @Override
-	public void sessionCreated(HttpSessionEvent se) {
-    	System.out.println("sessionCreated...");
-		Object user = se.getSession().getAttribute("user");
-		System.out.println(user);
-		count = (int)sc.getAttribute("count");
-		if(user != null && count >= 0) {
-			se.getSession().setAttribute("count",++count);
-		}
-	}
-
-    @Override
-    public void sessionDestroyed(HttpSessionEvent se) {
-    	System.out.println("sessionDestroyed()...");
-    	count = (int)sc.getAttribute("count");
-    	if(count >= 0) {
-    		se.getSession().setAttribute("count",--count);
-    	}
-    }
+	private static ServletContext context = null;
+	private static Integer userNum = 0;
 	
-    /**
-     * 服务器初始化时设置人数为0,否则设置当前人数即可
+	/**
+     * 	容器初始化
      */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		System.out.println("contextInitialized...");
-		sc = sce.getServletContext();
-		if(sc == null) {
-			sc.setAttribute("count", 0);
-			System.out.println("count:"+sc.getAttribute("count"));
+		context = sce.getServletContext();
+		// 初始化歌曲类型
+		ISongTypeService its = ServiceFactory.getSongTypeService();
+		List<SongType> types = its.getAll();
+		context.setAttribute("types", types);
+		System.out.println(context.getAttribute("types"));
+		if(context == null) {
+			// 初始化在线人数
+			context.setAttribute("count", 0);
 		} else {
-			sc.setAttribute("count", count);
+			context.setAttribute("count", userNum);
 		}
+		System.out.println("count:"+context.getAttribute("count"));
 	}
+	
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		System.out.println("contextDestroyed()...");
+		context = sce.getServletContext();
+		if(context != null) {
+			context.removeAttribute("count");
+			context.removeAttribute("types");
+		}
 	}
+	
+	/**
+	 * 	创建session
+	 */
+    @Override
+	public void sessionCreated(HttpSessionEvent se) {
+    	System.out.println("sessionCreated...");
+    	if(context != null && context.getAttribute("count") instanceof Integer) {
+    		userNum = (Integer)context.getAttribute("count");
+			if(userNum >= 0) {
+				context.setAttribute("userNum",++userNum);
+			}
+    	}
+	}
+    
+    @Override
+    public void sessionDestroyed(HttpSessionEvent se) {
+    	System.out.println("sessionDestroyed()...");
+    	userNum = (Integer)context.getAttribute("count");
+    	if(userNum >= 0) {
+    		context.setAttribute("userNum",--userNum);
+    	}
+    }
 }

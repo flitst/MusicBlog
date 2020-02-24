@@ -3,7 +3,7 @@ package com.explorer.musicblog.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import com.explorer.musicblog.dao.ILyricDAO;
+import com.explorer.musicblog.dao.ILyricDao;
 import com.explorer.musicblog.dao.impl.DaoFactory;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Lyric;
@@ -15,41 +15,65 @@ import com.explorer.musicblog.service.ILyricService;
  */
 public class LyricServiceImpl implements ILyricService {
 
-	ILyricDAO ild = DaoFactory.getLyricDao();
+	ILyricDao lyricDao = DaoFactory.getLyricDao();
+
+	@Override
+	public List<Lyric> getByName(String name) {
+		return lyricDao.getByName(name);
+	}
 
 	@Override
 	public List<Lyric> getAll() {
-		return ild.getAll();
+		return lyricDao.getAll();
 	}
 
 	@Override
 	public Integer insert(Lyric type) {
-		return ild.insert(type);
+		return lyricDao.insert(type);
 	}
 
 	@Override
 	public Integer update(Lyric type) {
-		return ild.update(type);
+		return lyricDao.update(type);
 	}
 
 	@Override
 	public Integer delete(Lyric type) {
-		return ild.delete(type);
+		return lyricDao.delete(type);
 	}
 
 	@Override
 	public Integer commonCUD(String sql, Object... args) throws Exception {
-		return ild.renew(sql, args);
+		return lyricDao.renew(sql, args);
 	}
 	
 	@Override
 	public List<Map<String, Object>> commonQuery(Class<Lyric> clazz, String sql, Object... args)
 			throws CustomException, Exception {
-		return ild.query(clazz, sql, args);
+		return lyricDao.query(clazz, sql, args);
 	}
 	
 	@Override
 	public List<Map<String, Object>> get(List<Map<String, Object>> params) throws CustomException, Exception {
-		return ild.get(params);
+		return lyricDao.get(params);
 	}
+
+	@Override
+	public Integer getSize() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Lyric getById(Integer id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer delete(Integer id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

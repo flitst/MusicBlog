@@ -8,39 +8,40 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.explorer.musicblog.dao.ISongDAO;
+import com.explorer.musicblog.dao.ISongDao;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Song;
-import com.explorer.musicblog.utils.DBUtil;
+import com.explorer.musicblog.util.DBUtils;
 
 /**
  * zhangzhong Jul 2, 201810:29:00 PM
  */
-public class SongDaoImpl implements ISongDAO {
+public class SongDaoImpl implements ISongDao {
 
 	Connection conn = null;
-	PreparedStatement pstmt = null;
+	PreparedStatement ps = null;
 	ResultSet rs = null;
 
 	@Override
 	public Integer insert(Song song) {
-		String sql = "insert into `t_song`(`name`,`singer`,`lyric`,`type`,`create_time`,`update_time`) values (?,?,?,?,now(),now())";
+		String sql = "insert into `song`(`name`,`singer`,`lyric`,`type`,`create_time`,`update_time`) values (?,?,?,?,now(),now())";
+		DBUtils db = new DBUtils();
 		Integer i = null;
-		DBUtil db = new DBUtil();
 		try {
-			pstmt = db.getConn().prepareStatement(sql);
-			pstmt.setString(1, song.getName());
-			pstmt.setObject(2, song.getSinger());
-			pstmt.setObject(3, song.getLyric());
-			pstmt.setObject(4, song.getType());
-			i = pstmt.executeUpdate();
+			ps = db.getConnection().prepareStatement(sql);
+			ps.setString(1, song.getName());
+			ps.setObject(2, song.getSinger());
+			ps.setObject(3, song.getLyric());
+			ps.setObject(4, song.getType());
+			System.out.println(db.printSQL(ps,"新增歌曲"));
+			i = ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -49,24 +50,25 @@ public class SongDaoImpl implements ISongDAO {
 	}
 
 	@Override
-	public Integer delete(Integer id, String name) {
-		String sql = "delete from `t_song` where `id`=?";
+	public Integer delete(Integer id) {
+		String sql = "delete from `song` where `id`=?";
 		Integer i = null;
-		DBUtil db = new DBUtil();
+		DBUtils db = new DBUtils();
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, id);
-			i = pstmt.executeUpdate();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			System.out.println(db.printSQL(ps,"删除歌曲"));
+			i = ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -79,26 +81,27 @@ public class SongDaoImpl implements ISongDAO {
 	}
 	@Override
 	public Integer update(Song song) {
-		String sql = "update `t_song` set `name`=?,`singer`=?,`lyric`=?,`type`=? `update_time`=now()";
+		String sql = "update `song` set `name`=?,`singer`=?,`lyric`=?,`type`=? `update_time`=now()";
 		Integer i = null;
-		DBUtil db = new DBUtil();
+		DBUtils db = new DBUtils();
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, song.getName());
-			pstmt.setObject(2, song.getSinger());
-			pstmt.setObject(3, song.getLyric());
-			pstmt.setObject(4, song.getType());
-			i = pstmt.executeUpdate();
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, song.getName());
+			ps.setObject(2, song.getSinger());
+			ps.setObject(3, song.getLyric());
+			ps.setObject(4, song.getType());
+			System.out.println(db.printSQL(ps,"修改歌曲"));
+			i = ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -109,16 +112,17 @@ public class SongDaoImpl implements ISongDAO {
 	@Override
 	public List<Song> getAll() {
 		//"select * from `tb_song`"
-		String sql = "select id ID, name 歌名, singer 歌手, lyric 歌词, type 类型,  create_time 新增时间, update_time 修改时间 from t_song limit 0,3";
-		DBUtil db = new DBUtil();
+		String sql = "select `id` ID, `name` 歌名, `singer` 歌手, `lyric` 歌词, `type` 类型,  `create_time` 新增时间, `update_time` 修改时间 from `song` limit 0,3";
+		DBUtils db = new DBUtils();
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
+			ps = conn.prepareStatement(sql);
+			System.out.println(db.printSQL(ps,"获取所有歌曲"));
+			rs = ps.executeQuery();
 			List<Song> songs = new LinkedList<Song>();
 			Song song = null;
 			while (rs.next()) {
@@ -137,7 +141,7 @@ public class SongDaoImpl implements ISongDAO {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -147,22 +151,21 @@ public class SongDaoImpl implements ISongDAO {
 	
 	@Override
 	public List<Song> getByName(Integer num,String name) {
-		String sql = "select id ID,name 歌名,singer 歌手,lyric 歌词,type 类型,  create_time 新增时间, update_time 修改时间 from t_song";
+		String sql = "select `id` ID,`name` 歌名,`singer` 歌手,`lyric` 歌词,`type` 类型, `create_time` 新增时间, `update_time` 修改时间 from `song`";
 		if(num != null && num >= 0) {
-			sql = "select id ID,name 歌名,singer 歌手,lyric 歌词,type 类型,  create_time 新增时间, update_time 修改时间 from t_song where name like ?";
+			sql = "select `id` ID,`name` 歌名,`singer` 歌手,`lyric` 歌词,`type` 类型,  `create_time` 新增时间, `update_time` 修改时间 from `song` where `name` like ?";
 		}
-		DBUtil db = new DBUtil();
+		DBUtils db = new DBUtils();
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, "%"+name+"%");
-			System.out.println("pstmt:"+pstmt);
-			rs = pstmt.executeQuery();
-			System.out.println("rs:"+rs);
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, "%"+name+"%");
+			System.out.println(db.printSQL(ps,"根据歌曲名获取"));
+			rs = ps.executeQuery();
 			List<Song> songs = new LinkedList<Song>();
 			Song song = null;
 			while (rs.next()) {
@@ -181,7 +184,7 @@ public class SongDaoImpl implements ISongDAO {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -189,20 +192,20 @@ public class SongDaoImpl implements ISongDAO {
 		return null;
 	}
 	@Override
-	public Song getSongById(Integer id, String name) {
-		//select * from `tb_song` where `id`=?
-		String sql = "select id ID,name 名字,singer 歌手,lyric 歌词,type 类型,  create_time 新增时间, update_time 修改时间 from t_song";
+	public Song getById(Integer id) {
+		String sql = "select `id` ID,`name` 名字,`singer` 歌手,`lyric` 歌词,`type` 类型, `create_time` 新增时间, `update_time` 修改时间 from `song`";
 		Song song = new Song();
-		DBUtil db = new DBUtil();
+		DBUtils db = new DBUtils();
 		try {
 			try {
-				conn = db.getConn();
+				conn = db.getConnection();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, id);
-			rs = pstmt.executeQuery();
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, id);
+			System.out.println(db.printSQL(ps,"根据歌曲ID获取"));
+			rs = ps.executeQuery();
 			while (rs.next()) {
 				song.setId(rs.getInt("ID"));
 				song.setName(rs.getString("歌名"));
@@ -216,7 +219,7 @@ public class SongDaoImpl implements ISongDAO {
 			e.printStackTrace();
 		} finally {
 			try {
-				db.close(rs, pstmt, conn);
+				db.close(rs, ps, conn);
 			} catch (CustomException e) {
 				e.printStackTrace();
 			}
@@ -224,6 +227,20 @@ public class SongDaoImpl implements ISongDAO {
 		return song;
 	}
 
+	@Override
+	public Integer getSize() throws Exception {
+		String sql = "select count(*) from `song`";
+		DBUtils db = new DBUtils();
+		conn = db.getConnection();
+		ps = conn.prepareStatement(sql);
+		rs = ps.executeQuery();
+		Integer num = null;
+		while (rs.next()) {
+			num = rs.getInt(1);
+		}
+		return num;
+	}
+	
 	@Override
 	public Integer renew(String sql, Object... args) {
 		return null;
@@ -238,4 +255,17 @@ public class SongDaoImpl implements ISongDAO {
 	public List<Map<String, Object>> get(List<Map<String, Object>> params) {
 		return null;
 	}
+
+	@Override
+	public List<Song> getByName(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Song getSongById(int id, String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

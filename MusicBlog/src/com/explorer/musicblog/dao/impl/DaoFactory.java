@@ -1,10 +1,11 @@
 package com.explorer.musicblog.dao.impl;
 
-import com.explorer.musicblog.dao.ILyricDAO;
-import com.explorer.musicblog.dao.ISingerDAO;
-import com.explorer.musicblog.dao.ISongDAO;
-import com.explorer.musicblog.dao.ITypeDAO;
-import com.explorer.musicblog.dao.IUserDAO;
+import com.explorer.musicblog.dao.IArticleDao;
+import com.explorer.musicblog.dao.ILyricDao;
+import com.explorer.musicblog.dao.ISingerDao;
+import com.explorer.musicblog.dao.ISongDao;
+import com.explorer.musicblog.dao.ISongTypeDao;
+import com.explorer.musicblog.dao.IUserDao;
 
 /**
  * zhangzhong
@@ -12,19 +13,52 @@ import com.explorer.musicblog.dao.IUserDAO;
  */
 public class DaoFactory {
 
-	public static IUserDAO getUserDao() {
+	/**
+	 * 用户实例
+	 * @return
+	 */
+	public static IUserDao getUserDao() {
 		return new UserDaoImpl();
 	}
-	public static ITypeDAO getTypeDao() {
-		return new TypeDaoImpl();
+	
+	/**
+	 * 歌曲类型实例
+	 * @return
+	 */
+	public static ISongTypeDao getTypeDao() {
+		return new SongTypeDaoImpl();
 	}
-	public static ISingerDAO getSingerDao() {
+	
+	/**
+	 * 歌手实例
+	 * @return
+	 */
+	public static ISingerDao getSingerDao() {
 		return new SingerDaoImpl();
 	}
-	public static ISongDAO getSongDao() {
+	
+	/**
+	 * 歌曲实例
+	 * @return
+	 */
+	public static ISongDao getSongDao() {
 		return new SongDaoImpl();
 	}
-	public static ILyricDAO getLyricDao() {
+	
+	/**
+	 * 歌词实例
+	 * @return
+	 */
+	public static ILyricDao getLyricDao() {
 		return new LyricDaoImpl();
 	}
+	
+	/**
+	 * 文章实例
+	 * @return
+	 */
+	public static IArticleDao getArticleDao() {
+		return new ArticleDaoImpl();
+	}
+	
 }

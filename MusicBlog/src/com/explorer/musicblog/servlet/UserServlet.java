@@ -4,300 +4,225 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.User;
 import com.explorer.musicblog.service.IUserService;
-import com.explorer.musicblog.service.impl.ServiceFactory;
 import com.explorer.musicblog.service.impl.UserServiceImpl;
+import com.explorer.musicblog.util.StringUtils;
 
 /**
- * Servlet implementation class UserLogoutServlet
+ * 	UserServlet
+ * 	用户
  */
-@WebServlet(name = "/UserServlet", urlPatterns = "/UserServlet.do")
-public class UserServlet extends HttpServlet {
+@WebServlet(urlPatterns = "/UserServlet.do")
+public class UserServlet extends BaseServlet {
+	
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Enumeration<String> names = req.getParameterNames();
-		IUserService ius = ServiceFactory.getUserService();
-		while (names.hasMoreElements()) {
-			String nextElement = names.nextElement();
-			if (nextElement != null && !nextElement.isEmpty()) {
-				User u = new User();
-				if ("LOGIN".equals(nextElement.toUpperCase())) {
-					String account = req.getParameter("account");
-					String pwd = req.getParameter("pwd");
-					login(ius,account,pwd, req, resp);
-					break;
-				} else if ("REGISTER".equals(nextElement.toUpperCase())) {
-					register(ius, req, resp);
-					break;
-				} else if ("LOGOUT".equals(nextElement.toUpperCase())) {
-					Object key = req.getSession().getAttribute("ukey");
-					if(key != null && key instanceof String) {
-						String ukey = (String)key;
-						Object obj = req.getSession().getAttribute(ukey);
-						if(obj instanceof User) {
-							u = (User)obj;
-							logout(u,req, resp);
+	public void login(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		String account = req.getParameter("account");
+		String pwd = req.getParameter("pwd");
+		String piccode = req.getParameter("piccode");
+		String ukey = (String)req.getSession().getAttribute("ukey");
+		String k = (String)ukey;
+		Object obj = req.getSession().getAttribute(k);
+		String rememberMe = req.getParameter("rememberMe");
+		System.out.println("rememberMe:"+rememberMe);
+		Cookie[] cookies = req.getCookies();
+		if (obj != null && obj instanceof User || cookies != null && cookies.length > 0 && rememberMe != null && rememberMe.equals("on")) {
+			boolean bool = rememberMe(account, pwd, rememberMe, cookies,req, resp);
+			if (bool) {
+				req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
+				return;
+			}
+		}
+		// 验证账号和密码
+		if (StringUtils.isNotBlank(account) && StringUtils.isNotBlank(pwd)){
+			Object code = req.getSession().getAttribute("code");
+			// 验证用户输入的验证码
+			if (StringUtils.isNotBlank(piccode) && code instanceof String && piccode.equalsIgnoreCase((String)code)) {
+				// 验证完毕立即销毁此次验证码，以防下次登录时验证的还是之前的验证码
+				req.getSession().removeAttribute("code");
+				IUserService ius = new UserServiceImpl();
+				List<User> users = ius.getByName(account);
+				for (User u : users) {
+					if (u != null && u.getStatus() == 1) {
+						u = ius.login(account,pwd);
+						if (u != null && u.getId() != null) {
+							System.out.println("登录成功! 欢迎您:"+u.getAccount());
+							req.setAttribute("msg", "登录成功! 欢迎您:"+u.getAccount());
+			//				String key = u.getId()+u.getAccount();
+			//				req.getSession().setAttribute(key, u);
+			//				req.getSession().setAttribute("ukey", key);
+							req.getSession().setAttribute("title", "我的主页");
+							req.getSession().setAttribute("user", u);
+							req.getRequestDispatcher("/WEB-INF/user/Main.jsp").forward(req, resp);
+							return;
+						} else {
+							System.out.println("用户名或密码错误!");
+							req.setAttribute("error_msg", "用户名或密码错误!");
 						}
+					} else {
+						req.setAttribute("error_msg", "此账号已被禁用！若用疑问请<a href=\"RootControlServlet.do?params=contact\">联系站长<a>");
+						System.out.println("此账号已被禁用！");
 					}
-					break;
-				} else if ("UPDATE".equals(nextElement.toUpperCase())) {
-					req.getRequestDispatcher("UserUpdate.jsp").forward(req , resp);
-					//update(req,resp);
-					break;
-				} else if ("UPDATEPWD".equals(nextElement.toUpperCase())) {
-					req.getRequestDispatcher("UserPWDUpdate.jsp").forward(req , resp);
-					//updatePWD(ius,req,resp);
-					break;
-				} else if ("DELETE".equals(nextElement.toUpperCase())) {
-					delUser(u,ius, req, resp);
-					break;
-				} else if ("manager".equals(nextElement.toUpperCase())) {
-					managerUser(ius, req, resp);
-					break;
-				} else if ("FORGETPWD".equals(nextElement.toUpperCase())) {
-					forgetPWD(ius, req, resp);
-					break;
 				}
 			} else {
-				System.out.println("没有可执行的操作");
-			}
-
-		}
-		// /MusicBlog/WebContent/resources/user/pic/4d245.jpg
-	}
-
-
-	private void updatePWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
-		User u = new User();
-		ius.update(u);
-	}
-
-	private void forgetPWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
-	}
-
-	public void login(IUserService ius,String account,String pwd,HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		if(account != null && pwd != null && !"".equals(account.trim()) && !"".equals(pwd.trim())){
-			try {
-				User u = ius.login(account,pwd);
-				if (u != null && u.getId() != null) {
-					String rememberMe = req.getParameter("rememberMe");
-					System.out.println("rememberMe:"+rememberMe);
-					Cookie[] cookies = req.getCookies();
-					if (cookies != null && cookies.length > 0 && rememberMe != null && rememberMe.equals("on")
-							&& account != null && pwd != null && !"".equals(account.trim()) && !"".equals(pwd.trim())) {
-							try {
-								boolean bool  = rememberMe(u.getId().toString(), pwd,rememberMe,cookies, ius, req, resp);
-								if(bool) {
-									req.getRequestDispatcher("/UserLogin.jsp").forward(req, resp);
-									return;
-								}
-							} catch (CustomException e) {
-								e.printStackTrace();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-					}
-					System.out.println("登录成功! 欢迎您:"+u.getAccount());
-					req.setAttribute("msg", "登录成功! 欢迎您:"+u.getAccount());
-					String ukey = u.getId()+u.getAccount();
-					req.getSession().setAttribute(ukey, u);
-					req.getSession().setAttribute("ukey", ukey);
-					System.out.println("ukey:"+ukey);
-					System.out.println(req.getSession().getAttribute("ukey"));
-					req.getRequestDispatcher("/User.jsp").forward(req, resp);
-					return;
-				} else {
-					System.out.println("用户名或密码错误!");
-					req.setAttribute("msg", "用户名或密码错误!");
-				}
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}  catch (Exception e) {
-				e.printStackTrace();
+				req.setAttribute("error_msg", "验证码无效！");
 			}
 		} else {
 			System.out.println("用户名或密码不能为空!");
-			req.setAttribute("msg", "用户名或密码不能为空!");
+			req.setAttribute("error_msg", "用户名或密码不能为空!");
 		}
-		req.getRequestDispatcher("/UserLogin.jsp").forward(req, resp);
+		req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
 	}
 
-	private boolean rememberMe(String id,String pwd,String rememberMe,Cookie[] cookies,IUserService ius, HttpServletRequest req, HttpServletResponse resp)throws CustomException, Exception {
-		if (cookies != null && cookies.length > 0) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals(id) && cookie.getValue().equals(pwd)) {
-					User user = new User();
-					user.setAccount(cookie.getName());
-					user.setPwd(cookie.getValue());
-					req.getSession().setAttribute("account", id);
-					req.getSession().setAttribute("pwd", pwd);
-					return true;
+	private boolean rememberMe(String account,String pwd,String rememberMe,Cookie[] cookies, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		if (account != null && !"".equals(account) && pwd != null && !"".equals(pwd)) {
+			if (cookies != null && cookies.length > 0) {
+				for (Cookie cookie : cookies) {
+					if (cookie.getName().equals(account) && cookie.getValue().equals(pwd)) {
+						User user = new User();
+						user.setAccount(cookie.getName());
+						user.setPwd(cookie.getValue());
+						req.getSession().setAttribute("account", account);
+						req.getSession().setAttribute("pwd", pwd);
+						return true;
+					}
 				}
-			}
-		} else {
-			Cookie username = new Cookie("account", id);
-			Cookie pass = new Cookie("pwd", pwd);
-			username.setPath(req.getContextPath() + "/user");
-			pass.setPath(req.getContextPath() + "/user");
-			if (rememberMe != null && rememberMe.equals("on")) {
-				username.setMaxAge(60 * 60 * 24 * 3);// 三天
-				pass.setMaxAge(60 * 60 * 24 * 3);// 三天
 			} else {
-				username.setMaxAge(0);
-				pass.setMaxAge(0);
+				Cookie username = new Cookie("account", account);
+				Cookie pass = new Cookie("pwd", pwd);
+				username.setPath(req.getContextPath() + "/user");
+				pass.setPath(req.getContextPath() + "/user");
+				if (rememberMe != null && rememberMe.equals("on")) {
+					username.setMaxAge(60 * 60 * 24 * 3);// 三天
+					pass.setMaxAge(60 * 60 * 24 * 3);// 三天
+				} else {
+					username.setMaxAge(0);
+					pass.setMaxAge(0);
+				}
+				resp.addCookie(username);
+				resp.addCookie(pass);
 			}
-			resp.addCookie(username);
-			resp.addCookie(pass);
 		}
 		return false;
 	}
 	
-	private String checkAccount(HttpServletRequest req, HttpServletResponse resp,User user,IUserService iu,String account) throws IOException {
-		PrintWriter out = resp.getWriter();
-		try {
-			User u = iu.getUser(user);
-			if(u != null) {
-				if(u.getId() != null && !account.equals(u.getAccount())) {
-					System.out.println("可以注册!");
-					out.printf("ok", true);
-					return "ok";
-				} else {
-					System.out.println("此帐号已注册!");
-					out.printf("not", false);
-					return "not";
-				}
-			} else {
-				System.out.println("获取账号失败!");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "null";
-	}
-	
-	private void checkEmail(HttpServletRequest req, HttpServletResponse resp, User user, IUserService iu)throws IOException {
-		PrintWriter out = resp.getWriter();
-		String email = req.getParameter("email");
-		if (email != null && email != "" && email.trim().length() > 0) {
-			user.setEmail(email);
-			User u = null;
-			try {
-				u = iu.getUser(user);
-				if (u.getEmail() != null && email.equals(u.getEmail())) {
-					System.out.println("此邮箱已注册!");
-					out.printf("not", false);
-				} else {
-					System.out.println("邮箱可以注册!");
-					out.printf("ok", true);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			System.out.println("邮箱为空!");
-		}
-	}
-	
-	private void checkMobile(HttpServletRequest req, HttpServletResponse resp,User user,IUserService iu,String mobile) throws IOException {
-		PrintWriter out = resp.getWriter();
-		if(mobile != "" && mobile != null && mobile.trim().length() > 0) {
-			user.setMobile(mobile);
-			User u = null;
-			try {
-				u = iu.getUser(user);
-				if(u != null) {
-					if(u.getMobile() != null && mobile.equals(u.getMobile())) {
-						System.out.println("此手机号已注册!");
-						out.printf("not", false);
-					} else {
-						System.out.println("手机号可以注册!");
-						out.printf("ok", true);
-					}
-				} else {
-					System.out.println("获取手机号错误!");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				System.out.println("手机号为空!");
-				req.setAttribute("null_mobile","ID账号为空!");
-				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-			} catch (ServletException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	
-	private void checkEmail(HttpServletRequest req, HttpServletResponse resp,User user,IUserService iu,String email) throws IOException {
-		PrintWriter out = resp.getWriter();
-		if(email != "" && email != null && email.trim().length() > 0) {
-			user.setEmail(email);
-			User u = null;
-			try {
-				u = iu.getUser(user);
-				if(u != null) {
-					if(u.getEmail() != null && email.equals(u.getEmail())) {
-						System.out.println("此邮箱已注册!");
-						out.printf("not", false);
-					} else {
-						System.out.println("邮箱可以注册!");
-						out.printf("ok", true);
-					}
-				} else {
-					System.out.println("获取邮箱错误!");
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else {
-			try {
-				System.out.println("邮箱为空!");
-				req.setAttribute("null_email","ID账号为空!");
-				req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-			} catch (ServletException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	/**
-	 * 退出登录
-	 * 
+	 * 	退出登录
+	 * @param user
 	 * @param req
 	 * @param resp
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	private void logout(User u,HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		if(u != null) {
-			Object obj = req.getSession().getAttribute(u.getId()+u.getAccount());
-			if (obj != null) {
-				req.getSession().removeAttribute(u.getId()+u.getAccount());
-				resp.sendRedirect("index.jsp");
-			} else {
-				req.setAttribute("msg", "获取用户信息失败!未能退出!");
-				req.getRequestDispatcher("User.jsp").forward(req, resp);
-			}
-		} else {
-			System.out.println("获取用户信息失败!");
+	public void logout(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+//		User user = new User();
+//		String key = (String)req.getSession().getAttribute("ukey");
+//		if(key != null && key instanceof String) {
+//			String ukey = (String)key;
+//			Object obj = req.getSession().getAttribute(ukey);
+//			if(obj instanceof User) {
+//				user = (User)obj;
+//			}
+//		}
+		User user = (User)req.getSession().getAttribute("user");
+		if(user != null) {
+//			Object obj = req.getSession().getAttribute(user.getId()+user.getAccount());
+//			if (obj != null) {
+				req.getSession().removeAttribute("user");
+				resp.sendRedirect(req.getContextPath()+"/index.jsp");
+				return;
+//			}
 		}
+		System.out.println("获取用户信息失败!");
+		req.setAttribute("error_msg", "获取用户信息失败!未能退出!");
+		req.getRequestDispatcher("/WEB-INF/user/Main.jsp").forward(req, resp);
+	}
+	
+	public void register(IUserService ius,HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		String account = req.getParameter("account");
+		String pwd = req.getParameter("pwd");
+		String email = req.getParameter("email");
+		String mobile = req.getParameter("mobile");
+		User user = new User();
+		boolean checkAccount = false;
+		if (StringUtils.isLegal(account) != null) {
+			checkAccount = checkAccount(user, ius, account, req, resp);
+			if(!checkAccount) {
+				return;
+			}
+		}
+		if (StringUtils.isLegal(account) != null && StringUtils.isLegal(pwd) != null) {
+			user.setAccount(account);
+			user.setPwd(pwd);
+			user.setNickname(null);
+			user.setSignature(null);
+			user.setAge((short)0);
+			user.setSex((byte)0);
+			String[] hobby = new String[]{};
+			user.setHobby(hobby);
+			user.setHead(null);
+			user.setImage(null);
+			user.setMobile(mobile);
+			user.setEmail(email);
+	    	// 2019年第48周,第332天 11月28日 星期:4 03:40:09
+	    	// SimpleDateFormat sdf = new SimpleDateFormat("yyyy年第w周,第D天 MM月dd日 星期:F HH:mm:ss");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date = sdf.format(new Date());
+			user.setCreateTime(date); //设置注册时间
+			user.setUpdateTime(date); //设置修改时间
+			IUserService userService = new UserServiceImpl();
+			Integer num = userService.insert(user);
+			req.setAttribute("title","用户注册");
+			if(num != null && num > 0) {
+				System.out.println("注册成功!");
+				req.setAttribute("msg","注册成功!");
+				req.getRequestDispatcher("/WEB-INF/user/RegisterSucceed.jsp").forward(req, resp);
+			} else {
+				System.out.println("注册失败!");
+				req.setAttribute("msg","注册失败!");
+				req.getRequestDispatcher("/WEB-INF/user/RegisterError.jsp").forward(req, resp);
+			}
+		}
+	}
+	
+	private boolean checkAccount(User user,IUserService iu,String account, HttpServletRequest req, HttpServletResponse resp) throws Exception{
+		PrintWriter out = resp.getWriter();
+		user.setAccount(account);
+		User u = iu.checkUser(user);
+		if(u != null) {
+			out.write(" × 此帐号已注册!");
+			req.setAttribute("account_msg","对不起哦！此账号已存在，请重新输入！");
+			System.out.println("此帐号已注册!");
+			return false;
+		} else {
+			out.write(" √ 此账号可以注册!");
+			req.setAttribute("account_msg"," √ ");
+			System.out.println("此账号可以注册!");
+			return true;
+		}
+	}
+
+	public void updatePWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
+		String no = req.getParameter("no");
+		if(no != null && !"".equals(no)) {
+			System.out.println("no:"+no);
+			User u = new User();
+			ius.update(u);
+		}
+	}
+
+	public void forgetPWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
 	}
 	
 	/**
@@ -306,184 +231,19 @@ public class UserServlet extends HttpServlet {
 	 * @param req
 	 * @param resp
 	 */
-	private void managerUser(IUserService us, HttpServletRequest req,HttpServletResponse resp) {
+	public void manager(HttpServletRequest req,HttpServletResponse resp) {
+		IUserService us = new UserServiceImpl();
 		try {
 			List<User> all = us.getAll();
 			System.out.println("all:"+all);
 			req.setAttribute("users", all);
-			req.getRequestDispatcher("/UserManager.jsp").forward(req, resp);
+			req.getRequestDispatcher("/WEB-INF/user/UserManager.jsp").forward(req, resp);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void register(IUserService ius,HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-//		String account = req.getParameter("account");
-		String email = req.getParameter("email");
-		String mobile = req.getParameter("mobile");
-		User user = new User();
-//		if(account != null && "" != account && account.trim().length() > 0) {
-//			checkAccount(req, resp, user,ius,account);
-//			return;
-//		} else {
-//			System.out.println("ID账号为空!");
-//			req.setAttribute("id","ID账号为空!");
-//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-//		}
-//		if(email != null && "" != email && email.trim().length() > 0) {
-//			checkEmail(req, resp, user,ius,email);
-//			return;
-//		}
-//		if(mobile != null && "" != mobile && mobile.trim().length() > 0) {
-//			checkMobile(req, resp, user,ius,mobile);
-//			return;
-//		}
-//		if(req.getParameter("pwd") == null || req.getParameter("password") == "") {
-//			System.out.println("密码不能为空!");
-//			req.setAttribute("pwd", "密码不能为空!");
-//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-//			return;
-//		}
-//		if(req.getParameter("affirmPwd") == null || req.getParameter("affirmPwd") == "") {
-//			System.out.println("确认密码不能为空!");
-//			req.setAttribute("affirmPwd", "确认密码不能为空!");
-//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-//			return;
-//		}
-//		if(!(req.getParameter("pwd").equals(req.getParameter("affirmPwd")))) {
-//			System.out.println("两次输入的密码不一样!");
-//			req.setAttribute("status", "两次输入的密码不一样!");
-//			System.out.println(req.getParameter("pwd") + ",\t" + req.getParameter("affirmPwd"));
-//			req.getRequestDispatcher("/UserRegister.jsp").forward(req, resp);
-//			return;
-//		}
-		String name = req.getParameter("name");
-		String pwd = req.getParameter("pwd");
-		if(req.getParameter("email") != ""){
-			email = req.getParameter("email");
-		}
-		if(req.getParameter("mobile") != "") {
-			mobile = req.getParameter("mobile");
-		}
-		user.setAccount(name);
-		user.setAge((byte)0);
-		user.setSex((byte)0);
-		user.setHead(null);
-		user.setImage(null);
-		user.setPwd(pwd);
-		user.setEmail(email);
-		user.setMobile(mobile);
-    	//2019年第48周,第332天 11月28日 星期:4 03:40:09
-    	//SimpleDateFormat sdf = new SimpleDateFormat("yyyy年第w周,第D天 MM月dd日 星期:F HH:mm:ss");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 星期:F HH:mm:ss");
-		String date = sdf.format(new Date());
-		user.setCreateTime(date); //设置注册时间
-		user.setUpdateTime(date);	//设置修改时间
-		IUserService userService = new UserServiceImpl();
-		try {
-			Integer num = userService.insert(user);
-			if(num != null && num > 0) {
-				System.out.println("注册成功!");
-				req.setAttribute("msg","注册成功!");
-				req.getRequestDispatcher("UserAddOKMessage.jsp").forward(req, resp);
-			} else {
-				System.out.println("注册失败!");
-				req.setAttribute("msg","注册失败!");
-				req.getRequestDispatcher("UserAddErrorMessage.jsp").forward(req, resp);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void get() {
-//		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-//		HashMap<String, Object> hashMap = new HashMap<String, Object>();
-//		hashMap.put("param", "name");
-//		hashMap.put("pattern", "=");
-//		hashMap.put("value", "'" + name + "'");
-//		list.add(hashMap);
-//		hashMap = new HashMap<String, Object>();
-//		hashMap.put("param", "password");
-//		hashMap.put("pattern", "=");
-//		hashMap.put("value", "'" + pass + "'");
-//		list.add(hashMap);
-//		for (Map<String, Object> map : list) {
-//			System.out.print("param:"+map.get("param")+"\t");
-//			System.out.print("pattern:"+map.get("pattern")+"\t");
-//			System.out.println("value:"+map.get("value"));				
-//		}
-//		List<Map<String, Object>> users = null;
-//		try {
-//			users = ius.get(list);
-//		} catch (CustomException e) {
-//			e.printStackTrace();
-//		}
-//		for (int i = 0; i < users.size(); i++) {
-//			Map<String, Object> map = users.get(i);
-//			Object object = map.get("1");
-//			User u = (User) object;
-//			user.setUid(u.getUid());
-//			user.setName(u.getName());
-//			if (null != u.getNickname()) {
-//				user.setNickname(u.getNickname());
-//			} else {
-//				user.setNickname("暂无昵称");
-//			}
-//			if (null != u.getSignature()) {
-//				user.setSignature(u.getSignature());
-//			} else {
-//				user.setSignature("暂无签名");
-//			}
-//			if (1 == u.getSex()) {
-//				user.setSex(1);
-//			} else if (2 == u.getSex()) {
-//				user.setSex(2);
-//			} else {
-//				user.setSex(0);
-//			}
-//			user.setAge(u.getAge());
-//			String[] hobby = null;
-//			if (null != u.getHobby() && u.getHobby().length > 0) {
-//				hobby = new String[] { u.getHobby().toString() };
-//				user.setHobby(hobby);
-//			} else {
-//				hobby = new String[] { "暂无爱好" };
-//				user.setHobby(hobby);
-//			}
-//			if (null != u.getHead()) {
-//				user.setHead(u.getHead());
-//			} else {
-//				user.setHead("暂无头像");
-//			}
-//			if (null != u.getImage()) {
-//				user.setImage(u.getImage());
-//			} else {
-//				user.setImage("暂无图片");
-//			}
-//			if (null != u.getEmail()) {
-//				user.setEmail(u.getEmail());
-//			} else {
-//				user.setEmail("暂无邮箱");
-//			}
-//			if (null != u.getMobile()) {
-//				user.setMobile(u.getMobile());
-//			} else {
-//				user.setMobile("暂无手机");
-//			}
-//			user.setRegisterTime(u.getRegisterTime());
-//		}
-//		req.setAttribute("user", user);
-//		req.getRequestDispatcher("User.jsp").forward(req, resp);
-//		}else
-//	
-//		{
-//			req.setAttribute("message", "用户名或密码为空!");
-//			req.getRequestDispatcher("UserLogin.jsp").forward(req, resp);
-//		}
-	}
-	
-	private void update(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void update(IUserService ius, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String oldPwd = req.getParameter("old");
 		String newPwd = req.getParameter("new");
 		System.out.println(oldPwd);
@@ -516,7 +276,7 @@ public class UserServlet extends HttpServlet {
 			user.setNickname(nickname);
 			user.setSignature(signature);
 			if (age != null && !(age.trim().equals(""))) {
-				user.setAge(Byte.parseByte(age));
+				user.setAge(Short.parseShort(age));
 			} else {
 				user.setAge(null);
 			}
@@ -545,7 +305,7 @@ public class UserServlet extends HttpServlet {
 				if (num != null && num > 0) {
 					req.setAttribute("msg", "执行操作成功!欢迎你:" + user.getAccount());
 					req.setAttribute("user", user);
-					req.getRequestDispatcher("/User.jsp").forward(req, resp);
+					req.getRequestDispatcher("/WEB-INF/user/Main.jsp").forward(req, resp);
 					return;
 				} else {
 					req.setAttribute("msg", "执行操作失败!");
@@ -556,25 +316,97 @@ public class UserServlet extends HttpServlet {
 		} else {
 			req.setAttribute("msg", "无法修改!未查到用户信息!");
 		}
-		req.getRequestDispatcher("/UserLogin.jsp").forward(req, resp);
+		req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
 	}
 
+	/**
+	 * 禁用用户
+	 * @param us
+	 * @param req
+	 */
+	public void disableUser(HttpServletRequest req,HttpServletResponse resp) {
+		IUserService us = new UserServiceImpl();
+		String idStr = req.getParameter("id");
+		if(idStr != null && !"".equals(idStr)) {
+			User user = new User();
+			try {
+				int id = Integer.parseInt(idStr);
+				user.setId(id);
+				User u = us.getById(user.getId());
+				if (u != null) {
+					boolean bool = us.disableUser(id,(byte)0);
+					if(bool) {
+						req.setAttribute("msg","禁用用户成功!");
+						req.getRequestDispatcher("/WEB-INF/user/Delete.jsp").forward(req, resp);
+						System.out.println("禁用用户成功!");
+						return;
+					}
+				}
+				req.setAttribute("msg","禁用户失败!");
+				System.out.println("禁用户失败!");
+				req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * 禁用用户
+	 * @param us
+	 * @param req
+	 */
+	public void enableUser(HttpServletRequest req,HttpServletResponse resp) {
+		IUserService us = new UserServiceImpl();
+		String idStr = req.getParameter("id");
+		if(idStr != null && !"".equals(idStr)) {
+			User user = new User();
+			try {
+				int id = Integer.parseInt(idStr);
+				user.setId(id);
+				User u = us.getById(user.getId());
+				if (u != null) {
+					boolean bool = us.disableUser(id,(byte)1);
+					if(bool) {
+						req.setAttribute("msg","启用户成功!");
+						req.getRequestDispatcher("/WEB-INF/user/Delete.jsp").forward(req, resp);
+						System.out.println("启用用户成功!");
+						return;
+					}
+				}
+				req.setAttribute("msg","启用户失败!");
+				System.out.println("启用户失败!");
+				req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * 删除用户
 	 * @param us
 	 * @param req
 	 */
-	private void delUser(User u,IUserService us,HttpServletRequest req,HttpServletResponse resp) {
-		if(u != null && u.getId() != 0) {
+	public void delete(HttpServletRequest req,HttpServletResponse resp) {
+		IUserService us = new UserServiceImpl();
+		String id = req.getParameter("id");
+		if(id != null && !"".equals(id)) {
+			User user = new User();
 			try {
-				boolean bool = us.delete(u.getId());
-				if(bool) {
+				user.setId(Integer.parseInt(id));
+				Integer delete = us.delete(user.getId());
+				req.setAttribute("title","删除用户");
+				if(delete != null && delete > 0) {
 					req.getSession().removeAttribute("user");
 					req.setAttribute("msg","删除用户成功!");
-					req.getRequestDispatcher("UserDel.jsp").forward(req, resp);
+					System.out.println("删除用户成功!");
+					req.getRequestDispatcher("/WEB-INF/user/Delete.jsp").forward(req, resp);
+					return;
 				}
 				req.setAttribute("msg","删除用户失败!");
-				req.getRequestDispatcher("UserLogin.jsp").forward(req, resp);
+				System.out.println("删除用户失败!");
+				req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
 			} catch (CustomException e) {
 				e.getMessage(); 
 			} catch (Exception e) {

@@ -28,26 +28,28 @@ public class SingerServlet extends HttpServlet {
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String reqStr = req.getQueryString();
-		if(reqStr != null && !"".equals(reqStr) && reqStr.length() > 0) {
-			System.out.println("reqStr:"+reqStr);
+		String control = req.getParameter("singer");
+		if(control != null && !"".equals(control.trim()) && control.length() > 0) {
+			System.out.println("control:"+control);
 			ISingerService iss = ServiceFactory.getSingerService();
-			switch(reqStr.toUpperCase()) {
-				case "GETBYNAME":
+			switch(control) {
+				case "name":
 					getByName(iss,req,resp);
 					break;
-				case "ADD":
+				case "add":
 					add(iss,req,resp);
 					break;
-				case "UPDATE":
+				case "update":
 					update(iss,req,resp);
 					break;
-				case "DEL":
+				case "del":
 					del(iss,req,resp);
 					break;
-				case "GETALL":
+				case "all":
 					getAll(iss,req,resp);
 					break;
+				default :
+					System.out.println("没有可执行的操作！");
 			}
 		}
 	}
@@ -55,10 +57,10 @@ public class SingerServlet extends HttpServlet {
 	private void getByName(ISingerService iss,HttpServletRequest req, HttpServletResponse resp){
 		String name = req.getParameter("singername");
 		if(name != null && !"".equals(name.trim())) {
-			List<Singer> singers = iss.getSinger(name);
+			List<Singer> singers = iss.getByName(name);
 			req.setAttribute("singers", singers);
 			try {
-				req.getRequestDispatcher("Singer.jsp").forward(req, resp);
+				req.getRequestDispatcher("/singer/Singer.jsp").forward(req, resp);
 			} catch (ServletException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -96,7 +98,7 @@ public class SingerServlet extends HttpServlet {
 			Integer i = iss.insert(s);
 			if(i != null && i > 0) {
 				req.setAttribute("msg","添加歌手信息成功!");
-				req.getRequestDispatcher("Singer.jsp").forward(req, resp);
+				req.getRequestDispatcher("/singer/Singer.jsp").forward(req, resp);
 			}
 		}
 		System.out.println("添加歌手信息失败!");
@@ -135,17 +137,18 @@ public class SingerServlet extends HttpServlet {
 	}
 	
 	private void getAll(ISingerService iss,HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		System.out.println("getAll");
 		List<Map<String, Singer>> all = iss.getAllSinger();
 		System.out.println("all:"+all);
 		if(all != null && all.size() > 0) {
 			req.setAttribute("all", all);
 			req.setAttribute("msg","获取歌手信息成功!");
-			req.getRequestDispatcher("SingerGetAll.jsp").forward(req, resp);
+			req.getRequestDispatcher("/WEB-INF/singer/SingerGetAll.jsp").forward(req, resp);
+			return;
 		} else {
 			System.out.println("获取歌手信息失败!");
 			req.setAttribute("msg","获取歌手信息失败!");
 		}
+		req.getRequestDispatcher("/MusicBlog/WEB-INF/404.jsp").forward(req, resp);
 	}
 	
 	private void del(ISingerService iss,HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -153,7 +156,11 @@ public class SingerServlet extends HttpServlet {
 		String id = req.getParameter("id");
 		System.out.println(id);
 		if(id != null && !"".equals(id.trim())) {
-			iss.delete(Integer.parseInt(id));
+			try {
+				iss.delete(Integer.parseInt(id));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			System.out.println("删除歌手信息失败!");
 		}

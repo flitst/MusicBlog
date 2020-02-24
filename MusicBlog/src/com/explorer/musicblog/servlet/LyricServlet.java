@@ -67,10 +67,10 @@ public class LyricServlet extends HttpServlet {
 		List<Map<String, Object>> list = ils.get(null);
 		if(list != null && list.size() > 0) {
 			req.setAttribute("all", list);
-			req.getRequestDispatcher("LyricGetAll.jsp").forward(req, resp);
+			req.getRequestDispatcher("/lyric/LyricGetAll.jsp").forward(req, resp);
 		}
 		req.setAttribute("msg", "获取所有歌词失败!");
-		req.getRequestDispatcher("LyricMSG.jsp").forward(req, resp);
+		req.getRequestDispatcher("/lyric/LyricMSG.jsp").forward(req, resp);
 	}
 
 	private void del(ILyricService ils,HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -89,7 +89,7 @@ public class LyricServlet extends HttpServlet {
 					System.out.println("删除歌词失败!");
 					req.setAttribute("msg", "删除歌词失败!");
 				}
-				req.getRequestDispatcher("Lyric.jsp").forward(req, resp);
+				req.getRequestDispatcher("/lyric/Lyric.jsp").forward(req, resp);
 			}
 		}
 	}
@@ -110,7 +110,7 @@ public class LyricServlet extends HttpServlet {
 			List<Map<String, Object>> params = getParams(ils,list,map,"`id`","=",id);
 			if(params != null && params.size() > 0) {
 				req.setAttribute("lyric",params);
-				req.getRequestDispatcher("LyricGet.jsp").forward(req, resp);
+				req.getRequestDispatcher("/lyric/LyricGet.jsp").forward(req, resp);
 				return;
 			} else {
 				req.setAttribute("msg","获取歌词信息失败!");
@@ -119,7 +119,7 @@ public class LyricServlet extends HttpServlet {
 		} else {
 			req.setAttribute("msg","请求参数不能为空!");
 		}
-		req.getRequestDispatcher("LyricMSG.jsp").forward(req, resp);
+		req.getRequestDispatcher("/lyric/LyricMSG.jsp").forward(req, resp);
 	}
 
 	private void update(ILyricService ils,HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -141,7 +141,7 @@ public class LyricServlet extends HttpServlet {
 					if(count != null && count > 0) {
 						req.setAttribute("msg", "修改歌词成功!");
 						System.out.println("修改歌词成功!");
-						req.getRequestDispatcher("LyricMSG.jsp").forward(req, resp);
+						req.getRequestDispatcher("/lyric/LyricMSG.jsp").forward(req, resp);
 						return;
 					}
 				}
@@ -151,7 +151,7 @@ public class LyricServlet extends HttpServlet {
 		} else {
 			req.setAttribute("msg", "修改歌词失败!歌词ID不能为空!");
 		}
-		req.getRequestDispatcher("Lyric.jsp").forward(req, resp);
+		req.getRequestDispatcher("/lyric/Lyric.jsp").forward(req, resp);
 	}
 	private void add(ILyricService ils,HttpServletRequest req, HttpServletResponse resp) {
 		String song = req.getParameter("song");
@@ -166,10 +166,10 @@ public class LyricServlet extends HttpServlet {
 					req.setAttribute("msg", "添加歌词成功!");
 					req.setAttribute("count", count);
 					System.out.println("添加歌词成功!"+count);
-					req.getRequestDispatcher("LyricMSG.jsp").forward(req, resp);
+					req.getRequestDispatcher("/lyric/LyricMSG.jsp").forward(req, resp);
 				} else {
 					req.setAttribute("msg", "添加歌词失败!");
-					req.getRequestDispatcher("Lyric.jsp").forward(req, resp);
+					req.getRequestDispatcher("/lyric/Lyric.jsp").forward(req, resp);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

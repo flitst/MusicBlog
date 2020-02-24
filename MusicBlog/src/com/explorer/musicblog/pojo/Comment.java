@@ -2,41 +2,36 @@ package com.explorer.musicblog.pojo;
 /**
  * zhangzhong
  * Dec 2, 2019 7:58:08 PM
-    *   评论类
+ *   评论类
  */
 public class Comment {
 	
-	private Integer 	id;	    // 评论ID
-	private User 		user;	// 评论人
-	private String 		time;	// 评论时间
-	private String 		content;// 评论内容
-	private String 		at;		// 评论回复
-	private Character 	del;	// 删除评论	
+	private Integer id;	    	// 评论主键ID
+	private User	user;		// 评论者
+	private String content;		// 评论内容
+	private String at;			// 评论回复
 	private String createTime;  // 创建时间
     private String updateTime;  // 修改时间
 	
 	public Comment() {}
 
-	public Comment(Integer id, User user, String time, String content, String at, Character del, String createTime,
-            String updateTime) {
-        super();
-        this.id = id;
-        this.user = user;
-        this.time = time;
-        this.content = content;
-        this.at = at;
-        this.del = del;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
+    public Comment(Integer id, User user, String content, String at, String createTime, String updateTime) {
+		super();
+		this.id = id;
+		this.user = user;
+		this.content = content;
+		this.at = at;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+	}
 
-    @Override
-    public String toString() {
-        return "Comment [id=" + id + ", user=" + user + ", time=" + time + ", content=" + content + ", at=" + at
-                + ", del=" + del + ", createTime=" + createTime + ", updateTime=" + updateTime + "]";
-    }
+	@Override
+	public String toString() {
+		return "Comment [id=" + id + ", user=" + user + ", content=" + content + ", at=" + at + ", createTime="
+				+ createTime + ", updateTime=" + updateTime + "]";
+	}
 
-    public Integer getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -50,14 +45,6 @@ public class Comment {
 
 	public void setUser(User user) {
 		this.user = user;
-	}
-
-	public String getTime() {
-		return time;
-	}
-
-	public void setTime(String time) {
-		this.time = time;
 	}
 
 	public String getContent() {
@@ -75,22 +62,6 @@ public class Comment {
     public void setAt(String at) {
         this.at = at;
     }
-
-    public Character getDel() {
-        return del;
-    }
-
-    public void setDel(Character del) {
-        this.del = del;
-    }
-
-    public void setIsdel(Character isdel) {
-		if(isdel != null && isdel.charValue() == 'Y' || isdel.charValue() == 'N') {
-			this.del = isdel;
-		} else {
-			this.del = 'N';
-		}
-	}
 
     public String getCreateTime() {
         return createTime;

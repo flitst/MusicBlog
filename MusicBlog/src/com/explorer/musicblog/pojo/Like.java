@@ -7,33 +7,29 @@ package com.explorer.musicblog.pojo;
 public class Like {
 
 	private Integer id;	       // 点赞ID
-	private User user;		   // 用户
-	private Integer motif;	   // 主题
-	private Boolean status;	   // 点赞状态
-	private String time;	   // 点赞时间
+	private User user;		   // 点赞者
+	private Boolean status;	   // 点赞状态（1 成功 0 失败
 	private String createTime; // 创建时间
     private String updateTime; // 修改时间
 	
 	public Like() {}
 
-	public Like(Integer id, User user, Integer motif, Boolean status, String time, String createTime, String updateTime) {
+    public Like(Integer id, User user, Boolean status, String createTime, String updateTime) {
 		super();
 		this.id = id;
 		this.user = user;
-		this.motif = motif;
 		this.status = status;
-		this.time = time;
 		this.createTime = createTime;
-        this.updateTime = updateTime;
+		this.updateTime = updateTime;
 	}
 
 	@Override
-    public String toString() {
-        return "Like [id=" + id + ", user=" + user + ", motif=" + motif + ", status=" + status + ", time=" + time
-                + ", createTime=" + createTime + ", updateTime=" + updateTime + "]";
-    }
+	public String toString() {
+		return "Like [id=" + id + ", user=" + user + ", status=" + status + ", createTime=" + createTime
+				+ ", updateTime=" + updateTime + "]";
+	}
 
-    public Integer getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -49,14 +45,6 @@ public class Like {
 		this.user = user;
 	}
 
-	public Integer getMotif() {
-		return motif;
-	}
-
-	public void setMotif(Integer motif) {
-		this.motif = motif;
-	}
-
 	public Boolean getStatus() {
 		return status;
 	}
@@ -67,14 +55,6 @@ public class Like {
 		} else {
 			this.status = false;
 		}
-	}
-
-	public String getTime() {
-		return time;
-	}
-
-	public void setTime(String time) {
-		this.time = time;
 	}
 
     public String getCreateTime() {

@@ -1,5 +1,6 @@
 package com.explorer.musicblog.dao.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,6 +21,7 @@ import com.explorer.musicblog.util.DBUtils;
  * zhangzhong 2018年5月28日 下午11:58:41
  * 
  */
+@SuppressWarnings("unused")
 public class UserDaoImpl implements IUserDao {
     
 	private Connection conn = null;
@@ -37,15 +39,9 @@ public class UserDaoImpl implements IUserDao {
 		sql.append("(`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time`,`status`) ");
 		sql.append("values (?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
 		Integer i = null;
-		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql.toString());
+				ps = DBUtils.conn.prepareStatement(sql.toString());
 				ps.setString(1, user.getAccount());
 				ps.setString(2, user.getPwd());
 				ps.setString(3, user.getNickname());
@@ -59,16 +55,12 @@ public class UserDaoImpl implements IUserDao {
 				ps.setString(11, user.getMobile());
 				ps.setString(12, user.getCreateTime());
 				ps.setString(13, user.getUpdateTime());
-				System.out.println(db.printSQL(ps,"注册用户"));
+				System.out.println(DBUtils.printSQL(ps,"注册用户"));
 				i = ps.executeUpdate();
 			} catch (SQLException e) {
 				new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return i;
@@ -81,39 +73,53 @@ public class UserDaoImpl implements IUserDao {
 	public User login(String uname,String pwd) throws CustomException {
 		if (uname != null && pwd != null && !"".equals(uname.trim()) && !"".equals(pwd.trim())) {
 			String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time`,`status` from `user`where `account`=? and `pwd`=?";
-			DBUtils db = new DBUtils();
-			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-			}
-			if(conn != null) {
+			if(DBUtils.getDataBase() != null) {
 				try {
-					ps = conn.prepareStatement(sql);
+					ps = DBUtils.conn.prepareStatement(sql);
 					ps.setString(1, uname);
 					ps.setString(2, pwd);
-					System.out.println(db.printSQL(ps,"用户登录"));
+					System.out.println(DBUtils.printSQL(ps,"用户登录"));
 					rs = ps.executeQuery();
 					List<User> users = new ArrayList<User>();
 					User user = new User();
 					if(rs.next()) {
-						getUser(rs,user,users,true);
+						getUsers(rs,user,users,true);
 					}
 					return user;
 				} catch (SQLException e) {
 					throw new CustomException("执行SQL失败!" + e.getMessage());
 				} finally {
-					try {
-						db.close(rs, ps, conn);
-					} catch (CustomException e) {
-						new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-					}
+					DBUtils.close(rs, ps, conn);
 				}
 			}
 		} else {
 			throw new CustomException("无法取得用户信息!用户名或密码不能为空!");
 		}
 		return null;
+	}
+	
+	private User getUser(ResultSet rs,User user) throws SQLException {
+		user.setId(rs.getInt("id"));
+		user.setAccount(rs.getString("account"));
+		user.setNickname(rs.getString("nickname"));
+		user.setSignature(rs.getString("signature"));
+		user.setPwd(rs.getString("pwd"));
+		user.setAge(rs.getShort("age"));
+		user.setSex(rs.getByte("sex"));
+		String hobby = rs.getString("hobby");
+		if (hobby != null) {
+			String[] str = { hobby.toString() };
+			user.setHobby(str);
+		}
+		user.setHead(rs.getString("head"));
+		user.setImage(rs.getString("image"));
+		user.setEmail(rs.getString("email"));
+		user.setMobile(rs.getString("mobile"));
+		user.setCreateTime(rs.getString("create_time"));
+		user.setUpdateTime(rs.getString("update_time"));
+		user.setStatus(rs.getByte("status"));
+		System.out.println("getUser user:"+user);
+		return user;
 	}
 	
 	/**
@@ -125,29 +131,10 @@ public class UserDaoImpl implements IUserDao {
 	 * @return	存储好的用户对象list
 	 * @throws CustomException
 	 */
-	private List<User> getUser(ResultSet rs,User user,List<User> list,boolean bool) throws CustomException {
+	private List<User> getUsers(ResultSet rs,User user,List<User> list,boolean bool) throws CustomException {
 		while(bool) {
 			try {
-				user.setId(rs.getInt("id"));
-				user.setAccount(rs.getString("account"));
-				user.setNickname(rs.getString("nickname"));
-				user.setSignature(rs.getString("signature"));
-				user.setPwd(rs.getString("pwd"));
-				user.setAge(rs.getShort("age"));
-				user.setSex(rs.getByte("sex"));
-				String hobby = rs.getString("hobby");
-				if (hobby != null) {
-					String[] str = { hobby.toString() };
-					user.setHobby(str);
-				}
-				user.setHead(rs.getString("head"));
-				user.setImage(rs.getString("image"));
-				user.setEmail(rs.getString("email"));
-				user.setMobile(rs.getString("mobile"));
-				user.setCreateTime(rs.getString("create_time"));
-				user.setUpdateTime(rs.getString("update_time"));
-				user.setStatus(rs.getByte("status"));
-				System.out.println("getUser user:"+user);
+				user = getUser(rs, user);
 				if (list != null) {
 					list.add(user);
 				}
@@ -163,36 +150,26 @@ public class UserDaoImpl implements IUserDao {
 	public Integer delete(User type) {
 		return null;
 	}
+	
 	/**
 	 * 删除用户
 	 * @param id
 	 * @return
-	 * @throws Exception 
 	 */
 	@Override
-	public Integer delete(Integer id) throws Exception {
+	public Integer delete(Integer id) {
 		String sql = "delete from `user` where `id`=?;";
 		Integer i = null;
-		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql);
+				ps = DBUtils.conn.prepareStatement(sql);
 				ps.setInt(1, id);
-				System.out.println(db.printSQL(ps,"删除用户"));
+				System.out.println(DBUtils.printSQL(ps,"删除用户"));
 				i = ps.executeUpdate();
 			} catch (SQLException e) {
-				throw new Exception("执行SQL失败!" + e.getMessage());
+				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return i;
@@ -217,15 +194,9 @@ public class UserDaoImpl implements IUserDao {
 		sql.append("`status` = ?");
 		sql.append(" where `account` = ? and `pwd`=?;");
 		Integer i = null;
-		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql.toString());
+				ps = DBUtils.conn.prepareStatement(sql.toString());
 				ps.setString(1, user.getNickname());
 				ps.setString(2, user.getSignature());
 				ps.setInt(3, user.getAge());
@@ -239,16 +210,12 @@ public class UserDaoImpl implements IUserDao {
 				ps.setByte(11, user.getStatus());
 				ps.setString(12, user.getAccount());
 				ps.setString(13, user.getPwd());
-				System.out.println(db.printSQL(ps,"修改用户信息"));
+				System.out.println(DBUtils.printSQL(ps,"修改用户信息"));
 				i = ps.executeUpdate();
 			} catch (SQLException e) {
 				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return i;
@@ -261,48 +228,32 @@ public class UserDaoImpl implements IUserDao {
 	public Integer updatePWD(String oldpwd,User user) { 
 		String sql = "update `user` set pwd=?,update_time=now() where mobile=? or email=?";
 		Integer i = null;
-		DBUtils db = new DBUtils();
 		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		try {
-			if (conn != null) {
+			if (DBUtils.getDataBase() != null) {
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, user.getPwd());
 				ps.setString(2, user.getMobile());
 				ps.setString(3, user.getEmail());
-				System.out.println(db.printSQL(ps,"修改用户密码"));
+				System.out.println(DBUtils.printSQL(ps,"修改用户密码"));
 				i = ps.executeUpdate();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new RuntimeException("执行SQL失败!" + e.getMessage());
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return i;
 	}
 	
 	@Override
-	public Integer getSize() throws CustomException {
+	public Integer getSize() {
 		String sql = "select count(*) from `user`";
 		System.out.println("获取用户数SQL:"+sql);
-		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql);
-				System.out.println(db.printSQL(ps,"获取总用户数"));
+				ps = DBUtils.conn.prepareStatement(sql);
+				System.out.println(DBUtils.printSQL(ps,"获取总用户数"));
 				rs = ps.executeQuery();
 				Integer num = null;
 				while (rs.next()) {
@@ -310,13 +261,9 @@ public class UserDaoImpl implements IUserDao {
 				}
 				return num;
 			} catch (SQLException e) {
-				throw new CustomException("执行SQL失败!" + e.getMessage());
+				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;
@@ -328,17 +275,10 @@ public class UserDaoImpl implements IUserDao {
 	@Override
 	public List<User> getAll(){
 		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time`,`status` from `user`";
-		System.out.println("获取所有用户SQL:"+sql);
-		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql);
-				System.out.println(db.printSQL(ps,"获取所有用户"));
+				ps = DBUtils.conn.prepareStatement(sql);
+				System.out.println(DBUtils.printSQL(ps,"获取所有用户"));
 				rs = ps.executeQuery();
 				List<User> users = new ArrayList<User>();
 				User user = null;
@@ -355,7 +295,7 @@ public class UserDaoImpl implements IUserDao {
 					 */
 					user = new User();
 					try {
-						getUser(rs,user,users,true);
+						getUsers(rs,user,users,true);
 					} catch (CustomException e) {
 						e.printStackTrace();
 						throw new RuntimeException("获取用户信息失败!" + e.getMessage());
@@ -365,11 +305,39 @@ public class UserDaoImpl implements IUserDao {
 			} catch (SQLException e) {
 				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
+				DBUtils.close(rs, ps, conn);
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public User getByUserName(String name) throws Exception{
+		if (name == null || "".equals(name) ) {
+			return null;
+		}
+		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time`,`status` from `user` where `account`=?";
+		if(DBUtils.getDataBase() != null) {
+			try {
+				ps = DBUtils.conn.prepareStatement(sql);
+				ps.setString(1, name);
+				System.out.println(DBUtils.printSQL(ps,"根据账号获取用户"));
+				rs = ps.executeQuery();
+				User user = null;
+				while (rs.next()) {
+					user = new User();
+					try {
+						getUser(rs,user);
+					} catch (Exception e) {
+						e.printStackTrace();
+						throw new RuntimeException("获取用户信息失败!" + e.getMessage());
+					}
 				}
+				return user;
+			} catch (SQLException e) {
+				throw new RuntimeException("执行SQL失败!" + e.getMessage());
+			} finally {
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;
@@ -384,25 +352,18 @@ public class UserDaoImpl implements IUserDao {
 			return null;
 		}
 		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time`,`status` from `user` where `account` like ?";
-		System.out.println("获取所有用户SQL:"+sql);
-		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql);
+				ps = DBUtils.conn.prepareStatement(sql);
 				ps.setString(1, name);
-				System.out.println(db.printSQL(ps,"根据账号获取用户"));
+				System.out.println(DBUtils.printSQL(ps,"根据账号获取用户"));
 				rs = ps.executeQuery();
 				List<User> users = new ArrayList<User>();
 				User user = null;
 				while (rs.next()) {
 					user = new User();
 					try {
-						getUser(rs,user,users,true);
+						getUsers(rs,user,users,true);
 					} catch (CustomException e) {
 						e.printStackTrace();
 						throw new RuntimeException("获取用户信息失败!" + e.getMessage());
@@ -412,11 +373,7 @@ public class UserDaoImpl implements IUserDao {
 			} catch (SQLException e) {
 				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;
@@ -424,36 +381,26 @@ public class UserDaoImpl implements IUserDao {
 
 	/**
 	 * 根据用户ID查询用户
-	 * @throws Exception 
 	 */
 	@Override
-	public User getById(Integer id) throws Exception {
+	public User getById(Integer id) {
 		String sql = "select `id`,`account`,`pwd`,`nickname`,`signature`,`age`,`sex`,`hobby`,`head`,`image`,`email`,`mobile`,`create_time`,`update_time`,`status` from `user` where `id`=?";
 		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql);
+				ps = DBUtils.conn.prepareStatement(sql);
 				ps.setString(1, id.toString());
-				System.out.println(db.printSQL(ps,"根据用户ID获取用户"));
+				System.out.println(DBUtils.printSQL(ps,"根据用户ID获取用户"));
 				rs = ps.executeQuery();
 				User user = new User();
 				while (rs.next()) {
-					getUser(rs,user,null,true);
+					getUser(rs,user);
 				}
 				return user;
 			} catch (SQLException e) {
-				throw new Exception("执行SQL失败!" + e.getMessage());
+				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;
@@ -466,19 +413,13 @@ public class UserDaoImpl implements IUserDao {
 	@Override
 	public User checkUser(User user) throws CustomException {
 		String sql = "select `account`,`email`,`mobile` from `user` where `account`=? or `email`=? or `mobile`=?";
-		DBUtils db = new DBUtils();
-		try {
-			conn = db.getConnection();
-		} catch (Exception e) {
-			throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-		}
-		if(conn != null) {
+		if(DBUtils.getDataBase() != null) {
 			try {
-				ps = conn.prepareStatement(sql);
+				ps = DBUtils.conn.prepareStatement(sql);
 				ps.setString(1, user.getAccount());
 				ps.setString(2, user.getEmail());
 				ps.setString(3, user.getMobile());
-				System.out.println(db.printSQL(ps,"校验用户账号/邮箱/手机号"));
+				System.out.println(DBUtils.printSQL(ps,"校验用户账号/邮箱/手机号"));
 				rs = ps.executeQuery();
 				if (rs.next()) {
 					user.setAccount(rs.getString("account"));
@@ -489,11 +430,7 @@ public class UserDaoImpl implements IUserDao {
 			} catch (SQLException e) {
 				throw new CustomException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;
@@ -508,28 +445,18 @@ public class UserDaoImpl implements IUserDao {
 	@Override
 	public Integer renew(String sql, Object... args){
 		if (sql != null && sql.trim() != "" && args.length >= 0) {
-			DBUtils db = new DBUtils();
-			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-			}
-			if(conn != null) {
+			if(DBUtils.getDataBase() != null) {
 				try {
-					ps = conn.prepareStatement(sql);
+					ps = DBUtils.conn.prepareStatement(sql);
 					for (int i = 0; i < args.length; i++) {
 						ps.setObject(i + 1, args[i]);
 					}
-					System.out.println(db.printSQL(ps,"通用用户增删改"));
+					System.out.println(DBUtils.printSQL(ps,"通用用户增删改"));
 					return ps.executeUpdate();
 				} catch (SQLException e) {
 					throw new RuntimeException("执行SQL语句失败!" + e.getMessage());
 				} finally {
-					try {
-						db.close(rs, ps, conn);
-					} catch (CustomException e) {
-						new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-					}
+					DBUtils.close(rs, ps, conn);
 				}
 			}
 		}
@@ -544,19 +471,13 @@ public class UserDaoImpl implements IUserDao {
 	 * @param args  SQL语句的可变参数
 	 */
 	@Override
-	public List<Map<String, Object>> query(Class<User> clazz, String sql, Object... args) throws Exception{
+	public List<Map<String, Object>> query(Class<User> clazz, String sql, Object... args){
 		if (clazz != null && sql != null && sql.trim() != "") {
 			System.out.println(sql);
-			DBUtils db = new DBUtils();
-			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-			}
-			if (conn != null) {
+			if (DBUtils.getDataBase() != null) {
 				try {
-					ps = conn.prepareStatement(sql);
-					System.out.println(db.printSQL(ps,"通用用户查询"));
+					ps = DBUtils.conn.prepareStatement(sql);
+					System.out.println(DBUtils.printSQL(ps,"通用用户查询"));
 					for (int i = 0; i < args.length; i++) {
 						ps.setObject(i + 1, args[i]);
 					}
@@ -567,7 +488,14 @@ public class UserDaoImpl implements IUserDao {
 					List<Map<String, Object>> users = new ArrayList<Map<String, Object>>();
 					Map<String, Object> map = new HashMap<String, Object>();
 					while (rs.next()) {
-						User user = clazz.getDeclaredConstructor().newInstance();
+						User user = null;
+						try {
+							user = clazz.getDeclaredConstructor().newInstance();
+						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+								| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						System.out.println(user);
 						for (int i = 1; i <= count; i++) {
 							Object columnValue = rs.getObject(i);
@@ -588,11 +516,7 @@ public class UserDaoImpl implements IUserDao {
 					e.printStackTrace();
 					System.out.println("SQL执行错误!" + e.getMessage());
 				} finally {
-					try {
-						db.close(rs, ps, conn);
-					} catch (CustomException e) {
-						new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-					}
+					DBUtils.close(rs, ps, conn);
 				}
 			}
 		}
@@ -616,16 +540,10 @@ public class UserDaoImpl implements IUserDao {
 				sb.append(" " + params.get(i).get("value"));
 			}
 			System.out.println("sb:" + sb.toString());
-			DBUtils db = new DBUtils();
-			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-			}
-			if(conn != null) {
+			if(DBUtils.getDataBase() != null) {
 				try {
-					ps = conn.prepareStatement(sb.toString());
-					System.out.println(db.printSQL(ps,"通用用户获取"));
+					ps = DBUtils.conn.prepareStatement(sb.toString());
+					System.out.println(DBUtils.printSQL(ps,"通用用户获取"));
 					ResultSet rs = ps.executeQuery();
 					User u = new User();
 					List<Map<String, Object>> users = new ArrayList<Map<String, Object>>();
@@ -656,11 +574,7 @@ public class UserDaoImpl implements IUserDao {
 				} catch (SQLException e) {
 					throw new RuntimeException("执行SQL失败!" + e.getMessage());
 				} finally {
-					try {
-						db.close(rs, ps, conn);
-					} catch (CustomException e) {
-						throw new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-					}
+					DBUtils.close(rs, ps, conn);
 				}
 			}
 		}
@@ -674,18 +588,12 @@ public class UserDaoImpl implements IUserDao {
 	public boolean disableUser(Integer id,Byte value) {
 		if (id != null && value != null) {
 			String sql = "update `user` set `status`=? where id=?";
-			DBUtils db = new DBUtils();
-			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-			}
-			if (conn != null) {
+			if (DBUtils.getDataBase() != null) {
 				try {
-					ps = conn.prepareStatement(sql);
+					ps = DBUtils.conn.prepareStatement(sql);
 					ps.setInt(1, value);
 					ps.setInt(2, id);
-					System.out.println(db.printSQL(ps,"启用/禁用用户"));
+					System.out.println(DBUtils.printSQL(ps,"启用/禁用用户"));
 					int i = ps.executeUpdate();
 					if (i > 0) {
 						return true;
@@ -693,11 +601,7 @@ public class UserDaoImpl implements IUserDao {
 				} catch (SQLException e) {
 					throw new RuntimeException("执行SQL失败!" + e.getMessage());
 				} finally {
-					try {
-						db.close(rs, ps, conn);
-					} catch (CustomException e) {
-						new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-					}
+					DBUtils.close(rs, ps, conn);
 				}
 			}
 		}

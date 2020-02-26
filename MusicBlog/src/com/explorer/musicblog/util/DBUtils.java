@@ -20,22 +20,14 @@ public class DBUtils {
 	public static PreparedStatement ps = null;
 	public static ResultSet rs = null;
 
-	// 给用户调用创建一个唯一实例
-	private static DBUtils instance = null;
-	
-	/**
-	 * 获取实例
-	 * @return
-	 */
-	public static synchronized DBUtils getInstance() {
-	    if (instance == null) {
-	       instance = new DBUtils(); 
-	    }
-	    return instance;
+	public static String printSQL(PreparedStatement ps,String msg) {
+		return msg + " SQL " + ps.toString().substring(ps.toString().indexOf(":"));
 	}
 	
-	public String printSQL(PreparedStatement ps,String msg) {
-		return msg + " SQL " + ps.toString().substring(ps.toString().indexOf(":"));
+	public static DBUtils getDataBase() {
+		DBUtils db = new DBUtils();
+		conn = db.getConnection();
+		return db;
 	}
 	
 	/**
@@ -78,7 +70,7 @@ public class DBUtils {
 	 * @param conn
 	 * @throws CustomException
 	 */
-	public void close(ResultSet rs, PreparedStatement ps, Connection conn) throws CustomException {
+	public static void close(ResultSet rs, PreparedStatement ps, Connection conn){
 		try {
 			if (rs != null) {
 				rs.close();
@@ -90,7 +82,7 @@ public class DBUtils {
 				conn.close();
 			}
 		} catch (SQLException e) {
-			throw new CustomException("关闭数据库连接错误!" + e.getMessage());
+			throw new RuntimeException("关闭数据库连接错误!" + e.getMessage());
 		}
 	}
 

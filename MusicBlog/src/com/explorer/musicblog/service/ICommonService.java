@@ -15,21 +15,21 @@ public interface ICommonService<T, K, V> {
 	 * @param type
 	 * @return Integer
 	 */
-	public Integer insert(T type);
+	public Integer insert(T type) throws Exception;
 	
 	/**
 	 * 修改
 	 * @param type
 	 * @return Integer
 	 */
-	public Integer update(T type);
+	public Integer update(T type) throws Exception;
 	
 	/**
 	 * 删除
 	 * @param type
 	 * @return Integer
 	 */
-	public Integer delete(T type);	
+	public Integer delete(T type) throws Exception;	
 
 	/**
 	 * 根据ID删除
@@ -49,7 +49,7 @@ public interface ICommonService<T, K, V> {
 	 * 根据名称获取信息
 	 * @return List<T>
 	 */
-	List<T> getByName(String name);
+	List<T> getByName(String name) throws Exception;
 	
 	/**
 	 * 根据ID获取信息
@@ -62,7 +62,7 @@ public interface ICommonService<T, K, V> {
 	 * 获取所有
 	 * @return List<T>
 	 */
-	List<T> getAll();
+	List<T> getAll() throws Exception;
 
 	/**
 	 * 获取对象总个数

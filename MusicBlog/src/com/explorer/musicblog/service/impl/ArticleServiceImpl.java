@@ -11,25 +11,25 @@ import com.explorer.musicblog.service.IArticleService;
 
 public class ArticleServiceImpl implements IArticleService {
 
-	IArticleDao articleDao = DaoFactory.getArticleDao();
+	IArticleDao articleDao = DaoFactory.getArticleDaoInstace();
 
 	@Override
-	public List<Article> getByName(String name) {
+	public List<Article> getByName(String name) throws Exception {
 		return articleDao.getByName(name);
 	}
 	
 	@Override
-	public Integer insert(Article type) {
+	public Integer insert(Article type) throws Exception {
 		return articleDao.insert(type);
 	}
 
 	@Override
-	public Integer update(Article type) {
+	public Integer update(Article type) throws Exception {
 		return articleDao.update(type);
 	}
 
 	@Override
-	public Integer delete(Article type) {
+	public Integer delete(Article type) throws Exception {
 		return articleDao.delete(type);
 	}
 
@@ -44,7 +44,7 @@ public class ArticleServiceImpl implements IArticleService {
 	}
 	
 	@Override
-	public List<Article> getAll() {
+	public List<Article> getAll() throws Exception {
 		return articleDao.getAll();
 	}
 

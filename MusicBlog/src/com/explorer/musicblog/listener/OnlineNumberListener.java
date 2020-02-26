@@ -1,5 +1,7 @@
 package com.explorer.musicblog.listener;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -34,25 +36,37 @@ public class OnlineNumberListener extends BaseServlet implements HttpSessionList
 		System.out.println("contextInitialized...");
 		context = sce.getServletContext();
 		// 初始化歌曲类型
-		ISongTypeService its = ServiceFactory.getSongTypeService();
-		List<SongType> types = its.getAll();
+		ISongTypeService its = ServiceFactory.getSongTypeServiceInstace();
+		List<SongType> types = null;
+		try {
+			types = its.getAll();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		context.setAttribute("types", types);
 		System.out.println(context.getAttribute("types"));
 		if(context == null) {
 			// 初始化在线人数
-			context.setAttribute("count", 0);
+			context.setAttribute("userNum", 0);
 		} else {
-			context.setAttribute("count", userNum);
+			context.setAttribute("userNum", userNum);
 		}
-		System.out.println("count:"+context.getAttribute("count"));
 	}
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		System.out.println("contextDestroyed()...");
+		while (DriverManager.getDrivers().hasMoreElements()) {
+			try {
+				DriverManager.deregisterDriver(DriverManager.getDrivers().nextElement());
+			} catch (SQLException e) {
+				throw new RuntimeException("注销JDBC驱动异常!"+e.getMessage());
+			}
+		}
 		context = sce.getServletContext();
 		if(context != null) {
-			context.removeAttribute("count");
+			context.removeAttribute("userNum");
 			context.removeAttribute("types");
 		}
 	}
@@ -63,9 +77,9 @@ public class OnlineNumberListener extends BaseServlet implements HttpSessionList
     @Override
 	public void sessionCreated(HttpSessionEvent se) {
     	System.out.println("sessionCreated...");
-    	if(context != null && context.getAttribute("count") instanceof Integer) {
-    		userNum = (Integer)context.getAttribute("count");
-			if(userNum >= 0) {
+    	if(context != null && context.getAttribute("userNum") instanceof Integer) {
+    		userNum = (Integer)context.getAttribute("userNum");
+			if(userNum == null || userNum >= 0) {
 				context.setAttribute("userNum",++userNum);
 			}
     	}
@@ -74,8 +88,8 @@ public class OnlineNumberListener extends BaseServlet implements HttpSessionList
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
     	System.out.println("sessionDestroyed()...");
-    	userNum = (Integer)context.getAttribute("count");
-    	if(userNum >= 0) {
+    	userNum = (Integer)context.getAttribute("userNum");
+    	if(userNum != null && userNum >= 0) {
     		context.setAttribute("userNum",--userNum);
     	}
     }

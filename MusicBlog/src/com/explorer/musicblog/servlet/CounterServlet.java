@@ -19,9 +19,12 @@ public class CounterServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 
-	//写入站点访问次数文件
+	/**
+	 * 写入站点访问次数文件
+	 * @param fileName
+	 * @param count
+	 */
 	public static void writeFile(String fileName,int count) {
-		System.out.println("fileName:"+fileName+" count:"+count);
 		try {
 			PrintWriter out = new PrintWriter(new FileWriter(fileName));
 			out.println(count);
@@ -31,7 +34,11 @@ public class CounterServlet extends HttpServlet {
 		}
 	}
 	
-	//读取站点访问次数文件
+	/**
+	 * 读取站点访问次数文件
+	 * @param fileName
+	 * @return
+	 */
 	public static int readFile(String fileName) {
 		System.out.println("fileName:"+fileName);
 		File file = new File(fileName);

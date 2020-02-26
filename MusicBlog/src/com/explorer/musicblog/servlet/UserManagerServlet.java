@@ -34,7 +34,7 @@ public class UserManagerServlet extends HttpServlet {
 		String del = req.getParameter("del");
 		String manager = req.getParameter("manager");
 		String login = req.getParameter("login");
-		IUserService ius = ServiceFactory.getUserService();
+		IUserService ius = ServiceFactory.getUserServiceInstace();
 		if(login != null && !"".equals(login.trim()) && del != null && !"".equals(del.trim()) && manager != null && !"".equals(manager.trim())) {
 			if("LOGIN".equals(login.toUpperCase())) {
 				login(ius,req,resp);

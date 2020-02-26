@@ -28,7 +28,7 @@ public class LyricServlet extends HttpServlet {
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String str = req.getQueryString();
 		System.out.println("add:"+str);
-		ILyricService ils = ServiceFactory.getLyricService();
+		ILyricService ils = ServiceFactory.getLyricServiceInstace();
 		if(str != null && !"".equals(str.trim())) {
 			if("ADD".equals(str.toUpperCase())) {
 				add(ils,req,resp);

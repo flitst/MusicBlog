@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.explorer.musicblog.dao.IArticleDao;
-import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Article;
 import com.explorer.musicblog.util.DBUtils;
 import com.explorer.musicblog.util.StringUtils;
@@ -32,10 +31,12 @@ public class ArticleDaoImpl implements IArticleDao {
 			ps.setObject(3, type.getDescription());
 			ps.setObject(4, type.getUid());
 			ps.setString(5, type.getBody());
-			System.out.println(db.printSQL(ps,"新增文章SQL"));
+			System.out.println(DBUtils.printSQL(ps,"新增文章SQL"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
@@ -56,10 +57,12 @@ public class ArticleDaoImpl implements IArticleDao {
 			ps.setInt(7, type.getCommentCount());
 			ps.setInt(8, type.getLike());
 			//ps.setString(9, type.getModifyTime());
-			System.out.println(db.printSQL(ps,"修改文章"));
+			System.out.println(DBUtils.printSQL(ps,"修改文章"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
@@ -72,33 +75,36 @@ public class ArticleDaoImpl implements IArticleDao {
 		try {
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, type.getId());
-			System.out.println(db.printSQL(ps,"删除文章SQL"));
+			System.out.println(DBUtils.printSQL(ps,"删除文章SQL"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
 
 	@Override
 	public Integer renew(String sql, Object... args) {
-		DBUtils db = new DBUtils();
 		if (null != StringUtils.isLegal(sql)){
 			try {
 				for (int i = 0; i < args.length; i++) {
 						ps.setObject(i + 1, args[i]);
 				}
-				System.out.println(db.printSQL(ps,"修改文章SQL"));
+				System.out.println(DBUtils.printSQL(ps,"修改文章SQL"));
 				return ps.executeUpdate();
 			} catch (SQLException e) {
 				e.printStackTrace();
+			} finally {
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;  
 	}
 
 	@Override
-	public Integer getSize() throws Exception {
+	public Integer getSize() {
 		String sql = "select count(*) from `article`";
 		System.out.println("获取用户数SQL:"+sql);
 		DBUtils db = new DBUtils();
@@ -111,20 +117,16 @@ public class ArticleDaoImpl implements IArticleDao {
 			try {
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
-				System.out.println(db.printSQL(ps,"获取文章总数"));
+				System.out.println(DBUtils.printSQL(ps,"获取文章总数"));
 				Integer count = null;
 				while(rs.next()) {
 					count = rs.getInt(1);
 				}
 				return count;
 			} catch (SQLException e) {
-				throw new Exception("执行SQL失败!" + e.getMessage());
+				throw new RuntimeException("执行SQL失败!" + e.getMessage());
 			} finally {
-				try {
-					db.close(rs, ps, conn);
-				} catch (CustomException e) {
-					new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-				}
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;
@@ -141,7 +143,7 @@ public class ArticleDaoImpl implements IArticleDao {
 			ps.setString(1, "%"+name+"%");
 			ps.setString(2, "%"+name+"%");
 			ps.setString(3, "%"+name+"%");
-			System.out.println(db.printSQL(ps,"根据名称获取文章"));
+			System.out.println(DBUtils.printSQL(ps,"根据名称获取文章"));
 			rs = ps.executeQuery();
 			Article article = null;
 			while (rs.next()) {
@@ -161,6 +163,8 @@ public class ArticleDaoImpl implements IArticleDao {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return articles;
 	}
@@ -174,7 +178,7 @@ public class ArticleDaoImpl implements IArticleDao {
 		try {
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
-			System.out.println(db.printSQL(ps,"获取用户所有文章"));
+			System.out.println(DBUtils.printSQL(ps,"获取用户所有文章"));
 			rs = ps.executeQuery();
 			Article article = null;
 			while (rs.next()) {
@@ -194,6 +198,8 @@ public class ArticleDaoImpl implements IArticleDao {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return articles;
 	}
@@ -206,7 +212,7 @@ public class ArticleDaoImpl implements IArticleDao {
 		List<Article> articles = new ArrayList<Article>();
 		try {
 			ps = conn.prepareStatement(sql);
-			System.out.println(db.printSQL(ps,"获取所有文章"));
+			System.out.println(DBUtils.printSQL(ps,"获取所有文章"));
 			rs = ps.executeQuery();
 			Article article = null;
 			while (rs.next()) {
@@ -226,12 +232,14 @@ public class ArticleDaoImpl implements IArticleDao {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return articles;
 	}
 
 	@Override
-	public List<Map<String, Object>> query(Class<Article> clazz, String sql, Object... args) throws Exception {
+	public List<Map<String, Object>> query(Class<Article> clazz, String sql, Object... args) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -243,13 +251,13 @@ public class ArticleDaoImpl implements IArticleDao {
 	}
 
 	@Override
-	public Integer delete(Integer id) throws Exception {
+	public Integer delete(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Article getById(Integer id) throws Exception {
+	public Article getById(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

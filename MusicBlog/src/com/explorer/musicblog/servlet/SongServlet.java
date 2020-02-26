@@ -30,7 +30,7 @@ public class SongServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		String song = req.getParameter("song");
 		System.out.println("song:"+song);
-		ISongService songService = ServiceFactory.getSongService();
+		ISongService songService = ServiceFactory.getSongServiceInstace();
 		if(song != null){
 			switch(song) {
 				case "add":

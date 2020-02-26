@@ -33,6 +33,11 @@ public class FileUtils {
 		return bi;
 	}
 	
+	/**
+	 * 获取文件夹下所有的文件（包含子目录里的文件）
+	 * @param files
+	 * @param path
+	 */
 	public static void getFiles(List<File> files, String path) {
 		File file = new File(path);
 		if (file.isDirectory()) {
@@ -48,21 +53,17 @@ public class FileUtils {
 	}
 	
 	/**
-	 * 	获取文件列表
+	 * 获取文件夹下文件列表（仅获取当前目录）
 	 * @param path
 	 * @return
 	 */
 	public static List<File> getFiles(String path){
 		List<File> lists = new ArrayList<>();
 		if(path != null && !"".equals(path.trim())) {
-			System.out.println("path:"+path);
 			File file = new File(path);
 			if(file != null && file.exists()) {
 				File[] files = file.listFiles();
 				for (File f : files) {
-//					System.out.println("f:"+f);
-//					System.out.println("abcPath:"+f.getAbsolutePath());
-//					System.out.println("name:"+f.getName());
 					lists.add(f);
 				}
 			}

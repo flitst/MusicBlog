@@ -15,30 +15,30 @@ import com.explorer.musicblog.service.ILyricService;
  */
 public class LyricServiceImpl implements ILyricService {
 
-	ILyricDao lyricDao = DaoFactory.getLyricDao();
+	ILyricDao lyricDao = DaoFactory.getLyricDaoInstace();
 
 	@Override
-	public List<Lyric> getByName(String name) {
+	public List<Lyric> getByName(String name) throws Exception {
 		return lyricDao.getByName(name);
 	}
 
 	@Override
-	public List<Lyric> getAll() {
+	public List<Lyric> getAll() throws Exception {
 		return lyricDao.getAll();
 	}
 
 	@Override
-	public Integer insert(Lyric type) {
+	public Integer insert(Lyric type) throws Exception {
 		return lyricDao.insert(type);
 	}
 
 	@Override
-	public Integer update(Lyric type) {
+	public Integer update(Lyric type) throws Exception {
 		return lyricDao.update(type);
 	}
 
 	@Override
-	public Integer delete(Lyric type) {
+	public Integer delete(Lyric type) throws Exception {
 		return lyricDao.delete(type);
 	}
 

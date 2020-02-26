@@ -10,7 +10,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * zhangzhong
@@ -20,21 +19,29 @@ import javax.servlet.http.HttpSession;
 public class CommonFilter implements Filter {
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		
+		// 将servlet转换成支持HTTP类型的servlet
 		HttpServletRequest req = (HttpServletRequest)request;
 		HttpServletResponse resp = (HttpServletResponse)response;
+		
+		// 设置请求/响应类型
 		req.setCharacterEncoding("UTF-8");
 		resp.setCharacterEncoding("UTF-8");
 		resp.setContentType("text/html;charset=UTF-8");
-		HttpSession session = req.getSession();
-		if(session != null) {
+		
+		// 设置浏览器不缓存
+		resp.setHeader("Cache-control", "no-cache");// HTTP1.1
+		resp.setHeader("Pragma", "no-cache");// HTTP1.0
+		
+//		Object user = req.getSession().getAttribute("user");
+//		if(user != null) {
 			System.out.println(">>> session");
 			chain.doFilter(req, resp);
 			System.out.println("session >>>");
-		} else {
-			resp.sendRedirect(req.getServletContext()+"/index.jsp");
-		}
+//		} else {
+//			resp.sendRedirect(req.getServletContext()+"/index.jsp");
+//		}
 	}
 
 }

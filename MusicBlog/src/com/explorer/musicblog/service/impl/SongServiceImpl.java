@@ -14,7 +14,7 @@ import com.explorer.musicblog.service.ISongService;
  */
 public class SongServiceImpl implements ISongService{
 
-	ISongDao songDao = DaoFactory.getSongDao();
+	ISongDao songDao = DaoFactory.getSongDaoInstace();
 
 	@Override
 	public Integer insert(Song song) {
@@ -22,7 +22,7 @@ public class SongServiceImpl implements ISongService{
 	}
 
 	@Override
-	public Integer delete(Integer id) throws Exception {
+	public Integer delete(Integer id) {
 		return songDao.delete(id);
 	}
 
@@ -62,17 +62,17 @@ public class SongServiceImpl implements ISongService{
 	}
 
 	@Override
-	public Song getById(Integer id) throws Exception {
+	public Song getById(Integer id) {
 		return songDao.getById(id);
 	}
 
 	@Override
-	public Integer getSize() throws Exception {
+	public Integer getSize() {
 		return songDao.getSize();
 	}
 
 	@Override
-	public List<Map<String, Object>> query(Class<Song> clazz, String sql, Object... args) throws Exception {
+	public List<Map<String, Object>> query(Class<Song> clazz, String sql, Object... args) {
 		return songDao.query(clazz, sql, args);
 	}
 

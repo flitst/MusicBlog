@@ -13,15 +13,20 @@ import com.explorer.musicblog.service.IUserService;
  */
 public class UserServiceImpl implements IUserService {
 
-	IUserDao userDao = DaoFactory.getUserDao();
+	IUserDao userDao = DaoFactory.getUserDaoInstace();
 
 	@Override
-	public List<User> getByName(String name) {
+	public User getByUserName(String name) throws Exception {
+		return userDao.getByUserName(name);
+	}
+	
+	@Override
+	public List<User> getByName(String name) throws Exception {
 		return userDao.getByName(name);
 	}
 	
 	@Override
-	public Integer insert(User user){
+	public Integer insert(User user) throws Exception {
 		if (user != null) {
 			return userDao.insert(user);
 		}
@@ -39,7 +44,7 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Integer update(User user){
+	public Integer update(User user) throws Exception {
 		if (user != null) {
 			return userDao.update(user);
 		}
@@ -47,12 +52,12 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public Integer updatePWD(String oldpwd,User user) {
+	public Integer updatePWD(String oldpwd,User user) throws Exception {
 		return userDao.updatePWD(oldpwd,user);
 	}
 	
 	@Override
-	public boolean disableUser(Integer id,Byte value) {
+	public boolean disableUser(Integer id,Byte value) throws Exception {
 		return userDao.disableUser(id,value);
 	}
 	

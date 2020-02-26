@@ -35,7 +35,7 @@ public interface ICommonDao<T, K, V> {
 	 * @return Integer
 	 * @throws Exception 
 	 */
-	public Integer delete(Integer id) throws Exception;
+	public Integer delete(Integer id);
 	
 	/**
 	 * 通用增改
@@ -56,7 +56,7 @@ public interface ICommonDao<T, K, V> {
 	 * @return
 	 * @throws Exception 
 	 */
-	T getById(Integer id) throws Exception;
+	T getById(Integer id);
 	
 	/**
 	 * 	获取所有
@@ -69,7 +69,7 @@ public interface ICommonDao<T, K, V> {
 	 * @return 对象总个数
 	 * @throws Exception
 	 */
-	Integer getSize()throws Exception;
+	Integer getSize();
 	
 	/**
 	 * 通用查询
@@ -79,7 +79,7 @@ public interface ICommonDao<T, K, V> {
 	 * @return List<Map<K, V>>
 	 * @throws Exception
 	 */
-	public List<Map<K, V>> query(Class<T> clazz, String sql, Object... args) throws Exception;
+	public List<Map<K, V>> query(Class<T> clazz, String sql, Object... args);
 
 	/**
 	 * 根据提供参数来查询(可用等值/模糊查询)

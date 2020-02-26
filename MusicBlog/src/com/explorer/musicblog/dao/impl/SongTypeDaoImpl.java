@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.explorer.musicblog.dao.ISongTypeDao;
-import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.SongType;
 import com.explorer.musicblog.util.DBUtils;
 
@@ -25,14 +24,20 @@ public class SongTypeDaoImpl implements ISongTypeDao {
 	DBUtils db = new DBUtils();
 
 	@Override
-	public Integer getSize() throws Exception {
+	public Integer getSize() {
 		String sql = "select count(*) from `song_type`";
 		conn = db.getConnection();
-		ps = conn.prepareStatement(sql);
-		rs = ps.executeQuery();
 		Integer num = null;
-		while (rs.next()) {
-			num = rs.getInt(1);
+		try {
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				num = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("执行SQL错误!" + e.getMessage());
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return num;
 	}
@@ -40,13 +45,13 @@ public class SongTypeDaoImpl implements ISongTypeDao {
 	@Override
 	public List<SongType> getAll(){
 		String sql = "select `id` ID,`name` 类型 , `create_time` 创建时间 ,`update_time` 修改时间 from `song_type`";
+		List<SongType> list = new ArrayList<SongType>();
 		try {
 			conn = db.getConnection();
 			PreparedStatement ps = conn.prepareStatement(sql);
-			System.out.println(db.printSQL(ps,"获取所有歌曲类型")+ps);
+			System.out.println(DBUtils.printSQL(ps,"获取所有歌曲类型")+ps);
 			ResultSet rs =  ps.executeQuery();
 			SongType type = null;
-			List<SongType> list = new ArrayList<SongType>();
 			while(rs.next()) {
 				type = new SongType();
 				type.setId(rs.getInt("ID"));
@@ -55,11 +60,12 @@ public class SongTypeDaoImpl implements ISongTypeDao {
 				type.setUpdateTime(rs.getString("修改时间"));
 				list.add(type);
 			}
-			return list;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RuntimeException("执行SQL错误!" + e.getMessage());
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
-		return null;
+		return list;
 	}
 
 	@Override
@@ -69,18 +75,13 @@ public class SongTypeDaoImpl implements ISongTypeDao {
 		try {
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, type.getType());
-			System.out.println(db.printSQL(ps,"新增歌曲类型"));
+			System.out.println(DBUtils.printSQL(ps,"新增歌曲类型"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			new RuntimeException("SQL执行错误 :"+e.getMessage());
 		} finally {
-			try {
-				db.close(null, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-				new RuntimeException("关闭数据库连接错误 :"+e.getMessage());
-			}
+			DBUtils.close(null, ps, conn);
 		}
 		return null;
 	}
@@ -93,18 +94,13 @@ public class SongTypeDaoImpl implements ISongTypeDao {
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, type.getType());
 			ps.setInt(2, type.getId());
-			System.out.println(db.printSQL(ps,"修改歌曲类型"));
+			System.out.println(DBUtils.printSQL(ps,"修改歌曲类型"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			new RuntimeException("SQL执行错误 :"+e.getMessage());
 		} finally {
-			try {
-				db.close(null, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-				new RuntimeException("关闭数据库连接错误 :"+e.getMessage());
-			}
+			DBUtils.close(null, ps, conn);
 		}
 		return null;
 	}
@@ -112,23 +108,17 @@ public class SongTypeDaoImpl implements ISongTypeDao {
 	@Override
 	public Integer delete(SongType type) {
 		String sql = "delete from `song_type` where id=?";
-		DBUtils db = new DBUtils();
 		conn = db.getConnection();
 		try {
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, type.getId());
-			System.out.println(db.printSQL(ps,"删除歌曲类型"));
+			System.out.println(DBUtils.printSQL(ps,"删除歌曲类型"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			new RuntimeException("SQL执行错误 :"+e.getMessage());
 		} finally {
-			try {
-				db.close(null, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-				new RuntimeException("关闭数据库连接错误 :"+e.getMessage());
-			}
+			DBUtils.close(null, ps, conn);
 		}
 		return null;
 	}
@@ -139,7 +129,7 @@ public class SongTypeDaoImpl implements ISongTypeDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> query(Class<SongType> clazz, String sql, Object... args) throws Exception {
+	public List<Map<String, Object>> query(Class<SongType> clazz, String sql, Object... args) {
 		return null;
 	}
 

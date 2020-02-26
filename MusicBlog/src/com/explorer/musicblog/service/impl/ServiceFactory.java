@@ -14,50 +14,50 @@ import com.explorer.musicblog.service.IUserService;
 public class ServiceFactory {
 
 	/**
-	 * 获取“用户”实例
+	 * 获取“用户”Service实例
 	 * @return
 	 */
-	public static IUserService getUserService() {
+	public static IUserService getUserServiceInstace() {
 		return new UserServiceImpl();
 	}
 
 	/**
-	 * 	获取“歌手”实例
+	 * 	获取“歌手”Service实例
 	 * @return
 	 */
-	public static ISingerService getSingerService() {
+	public static ISingerService getSingerServiceInstace() {
 		return new SingerServiceImpl();
 	}
 
 	/**
-	 * 	获取“歌词”实例
+	 * 	获取“歌词”Service实例
 	 * @return
 	 */
-	public static ILyricService getLyricService() {
+	public static ILyricService getLyricServiceInstace() {
 		return new LyricServiceImpl();
 	}
 
 	/**
-	 * 	获取“歌曲”实例
+	 * 	获取“歌曲”Service实例
 	 * @return
 	 */
-	public static ISongService getSongService() {
+	public static ISongService getSongServiceInstace() {
 		return new SongServiceImpl();
 	}
 
 	/**
-	 * 	获取“歌曲类型”实例
+	 * 	获取“歌曲类型”Service实例
 	 * @return
 	 */
-	public static ISongTypeService getSongTypeService() {
+	public static ISongTypeService getSongTypeServiceInstace() {
 		return new SongTypeServiceImpl();
 	}
 
 	/**
-	 * 	获取“文章”实例
+	 * 	获取“文章”Service实例
 	 * @return
 	 */
-	public static IArticleService getArticleService() {
+	public static IArticleService getArticleServiceInstace() {
 		return new ArticleServiceImpl();
 	}
 }

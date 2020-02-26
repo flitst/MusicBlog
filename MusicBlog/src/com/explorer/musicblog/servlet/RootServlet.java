@@ -51,11 +51,11 @@ public class RootServlet extends BaseServlet{
 		if(name != null && !"".equals(name.trim()) && pwd != null && !"".equals(pwd)) {
 			root = service.getRoot(name,pwd);
 			if(root != null && root.getAid() != null) {
-				IUserService userService = ServiceFactory.getUserService();
-				IArticleService articleService = ServiceFactory.getArticleService();
-				ISongTypeService songTypeService = ServiceFactory.getSongTypeService();
-				ISongService songService = ServiceFactory.getSongService();
-				ISingerService singerService = ServiceFactory.getSingerService();
+				IUserService userService = ServiceFactory.getUserServiceInstace();
+				IArticleService articleService = ServiceFactory.getArticleServiceInstace();
+				ISongTypeService songTypeService = ServiceFactory.getSongTypeServiceInstace();
+				ISongService songService = ServiceFactory.getSongServiceInstace();
+				ISingerService singerService = ServiceFactory.getSingerServiceInstace();
 				try {
 					// 获取总用户数
 					Integer users = userService.getSize();

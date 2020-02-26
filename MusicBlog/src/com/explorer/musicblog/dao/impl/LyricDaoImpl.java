@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.explorer.musicblog.dao.ILyricDao;
-import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Lyric;
 import com.explorer.musicblog.util.DBUtils;
 
@@ -27,29 +26,31 @@ public class LyricDaoImpl implements ILyricDao {
 	@Override
 	public List<Lyric> getByName(String name) {
 		String sql = "select * from `t_document` where title like %?% or body like %?%";
-		DBUtils db = new DBUtils();
-		conn = db.getConnection();
 		List<Lyric> lyrics = new ArrayList<>();
 		try {
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, name);
-			ps.setString(2, name);
-			rs = ps.executeQuery();
-			System.out.println(db.printSQL(ps,"根据歌词名获取歌词"));
-			Lyric lyric = null;
-			while (rs.next()) {
-				lyric = new Lyric();
-				lyric.setId(rs.getInt("id"));
-				lyric.setSong(rs.getString("song"));
-				lyric.setLyric(rs.getString("lyric"));
-				lyric.setSinger(rs.getString("singer"));
-				lyric.setContent(rs.getString("content"));
-				lyric.setCreateTime(rs.getString("create_time"));
-				lyric.setUpdateTime(rs.getString("update_time"));
-				lyrics.add(lyric);
+			if (DBUtils.getDataBase() != null ) {
+				ps = conn.prepareStatement(sql);
+				ps.setString(1, name);
+				ps.setString(2, name);
+				rs = ps.executeQuery();
+				System.out.println(DBUtils.printSQL(ps,"根据歌词名获取歌词"));
+				Lyric lyric = null;
+				while (rs.next()) {
+					lyric = new Lyric();
+					lyric.setId(rs.getInt("id"));
+					lyric.setSong(rs.getString("song"));
+					lyric.setLyric(rs.getString("lyric"));
+					lyric.setSinger(rs.getString("singer"));
+					lyric.setContent(rs.getString("content"));
+					lyric.setCreateTime(rs.getString("create_time"));
+					lyric.setUpdateTime(rs.getString("update_time"));
+					lyrics.add(lyric);
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return lyrics;
 	}
@@ -58,28 +59,26 @@ public class LyricDaoImpl implements ILyricDao {
 	@Override
 	public Integer renew(String sql, Object... args){
 		if (sql != null && !"".equals(sql.trim()) && args.length >= 0) {
-			DBUtils db = new DBUtils();
 			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-			}
-			try {
-				ps = conn.prepareStatement(sql);
-				System.out.println(db.printSQL(ps,"通用增/删/改"));
-				for (int i = 1; i <= args.length; i++) {
-					ps.setObject(i, args[i-1]);
+				if (DBUtils.getDataBase() != null) {
+					ps = conn.prepareStatement(sql);
+					System.out.println(DBUtils.printSQL(ps,"通用增/删/改"));
+					for (int i = 1; i <= args.length; i++) {
+						ps.setObject(i, args[i-1]);
+					}
 				}
 				return ps.executeUpdate();
 			} catch (SQLException e) {
 				throw new RuntimeException("SQL执行失败!" + e.getMessage());
+			} finally {
+				DBUtils.close(rs, ps, conn);
 			}
 		}
 		return null;
 	}
 
 	@Override
-	public List<Map<String, Object>> query(Class<Lyric> clazz, String sql, Object... args) throws Exception {
+	public List<Map<String, Object>> query(Class<Lyric> clazz, String sql, Object... args) {
 		return null;
 	}
 
@@ -92,16 +91,10 @@ public class LyricDaoImpl implements ILyricDao {
 				sb.append(" and "+map.get("param")+map.get("pattern")+map.get("value"));
 			}
 			System.out.println("sb:" + sb.toString());
-			DBUtils db = new DBUtils();
-			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				throw new RuntimeException("获取数据库连接失败!" + e.getMessage());
-			}
-			if(conn != null) {
+			if(DBUtils.getDataBase() != null) {
 				try {
 					ps = conn.prepareStatement(sb.toString());
-					System.out.println(db.printSQL(ps,"获取歌词"));
+					System.out.println(DBUtils.printSQL(ps,"获取歌词"));
 					ResultSet rs = ps.executeQuery();
 					List<Map<String, Object>> lyrics = new ArrayList<Map<String, Object>>();
 					HashMap<String, Object> lyric = new HashMap<String, Object>();
@@ -121,11 +114,7 @@ public class LyricDaoImpl implements ILyricDao {
 				} catch (SQLException e) {
 					throw new RuntimeException("执行SQL失败!" + e.getMessage());
 				} finally {
-					try {
-						db.close(rs, ps, conn);
-					} catch (CustomException e) {
-						throw new RuntimeException("关闭数据库连接失败!" + e.getMessage());
-					}
+					DBUtils.close(rs, ps, conn);
 				}
 			}
 		}
@@ -154,7 +143,7 @@ public class LyricDaoImpl implements ILyricDao {
 
 
 	@Override
-	public Integer getSize() throws Exception {
+	public Integer getSize() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.explorer.musicblog.dao.ISongDao;
-import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Song;
 import com.explorer.musicblog.util.DBUtils;
 
@@ -21,11 +20,11 @@ public class SongDaoImpl implements ISongDao {
 	Connection conn = null;
 	PreparedStatement ps = null;
 	ResultSet rs = null;
+	DBUtils db = new DBUtils();
 
 	@Override
 	public Integer insert(Song song) {
 		String sql = "insert into `song`(`name`,`singer`,`lyric`,`type`,`create_time`,`update_time`) values (?,?,?,?,now(),now())";
-		DBUtils db = new DBUtils();
 		Integer i = null;
 		try {
 			ps = db.getConnection().prepareStatement(sql);
@@ -33,18 +32,14 @@ public class SongDaoImpl implements ISongDao {
 			ps.setObject(2, song.getSinger());
 			ps.setObject(3, song.getLyric());
 			ps.setObject(4, song.getType());
-			System.out.println(db.printSQL(ps,"新增歌曲"));
+			System.out.println(DBUtils.printSQL(ps,"新增歌曲"));
 			i = ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return i;
 	}
@@ -62,16 +57,12 @@ public class SongDaoImpl implements ISongDao {
 			}
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
-			System.out.println(db.printSQL(ps,"删除歌曲"));
+			System.out.println(DBUtils.printSQL(ps,"删除歌曲"));
 			i = ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return i;
 	}
@@ -95,16 +86,12 @@ public class SongDaoImpl implements ISongDao {
 			ps.setObject(2, song.getSinger());
 			ps.setObject(3, song.getLyric());
 			ps.setObject(4, song.getType());
-			System.out.println(db.printSQL(ps,"修改歌曲"));
+			System.out.println(DBUtils.printSQL(ps,"修改歌曲"));
 			i = ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return i;
 	}
@@ -121,7 +108,7 @@ public class SongDaoImpl implements ISongDao {
 				e.printStackTrace();
 			}
 			ps = conn.prepareStatement(sql);
-			System.out.println(db.printSQL(ps,"获取所有歌曲"));
+			System.out.println(DBUtils.printSQL(ps,"获取所有歌曲"));
 			rs = ps.executeQuery();
 			List<Song> songs = new LinkedList<Song>();
 			Song song = null;
@@ -140,11 +127,7 @@ public class SongDaoImpl implements ISongDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
@@ -164,7 +147,7 @@ public class SongDaoImpl implements ISongDao {
 			}
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, "%"+name+"%");
-			System.out.println(db.printSQL(ps,"根据歌曲名获取"));
+			System.out.println(DBUtils.printSQL(ps,"根据歌曲名获取"));
 			rs = ps.executeQuery();
 			List<Song> songs = new LinkedList<Song>();
 			Song song = null;
@@ -183,11 +166,7 @@ public class SongDaoImpl implements ISongDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
@@ -204,7 +183,7 @@ public class SongDaoImpl implements ISongDao {
 			}
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
-			System.out.println(db.printSQL(ps,"根据歌曲ID获取"));
+			System.out.println(DBUtils.printSQL(ps,"根据歌曲ID获取"));
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				song.setId(rs.getInt("ID"));
@@ -218,25 +197,25 @@ public class SongDaoImpl implements ISongDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return song;
 	}
 
 	@Override
-	public Integer getSize() throws Exception {
+	public Integer getSize() {
 		String sql = "select count(*) from `song`";
 		DBUtils db = new DBUtils();
 		conn = db.getConnection();
-		ps = conn.prepareStatement(sql);
-		rs = ps.executeQuery();
 		Integer num = null;
-		while (rs.next()) {
-			num = rs.getInt(1);
+		try {
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				num = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("关闭数据库连接失败!" + e.getMessage());
 		}
 		return num;
 	}
@@ -247,7 +226,7 @@ public class SongDaoImpl implements ISongDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> query(Class<Song> clazz, String sql, Object... args) throws Exception {
+	public List<Map<String, Object>> query(Class<Song> clazz, String sql, Object... args) {
 		return null;
 	}
 

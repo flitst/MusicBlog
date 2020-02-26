@@ -18,17 +18,24 @@ public interface IUserDao extends ICommonDao<User, String, Object> {
 	public User login(String uname,String pwd) throws Exception;
 	
 	/**
+	 * 根据用户名查询用户
+	 * @param name
+	 * @return
+	 */
+	public User getByUserName(String name) throws Exception;
+	
+	/**
 	 * 修改用户密码
 	 * @param oldpwd 修改之前的密码
 	 * @param user 修改的信息，包括邮箱、手机验证方式
 	 */
-	public Integer updatePWD(String oldpwd,User user);
+	public Integer updatePWD(String oldpwd,User user) throws Exception;
 	
 	/**
 	 * 启用/禁用用户
 	 * @return
 	 */
-	public boolean disableUser(Integer id,Byte value);
+	public boolean disableUser(Integer id,Byte value) throws Exception;
 
 	/**
 	 * 获取用户信息

@@ -26,19 +26,34 @@ public class TypeServlet extends HttpServlet {
 		String param = req.getParameter("control");
 		System.out.println("param:"+param);
 		if(param != null) {
-			ISongTypeService its = ServiceFactory.getSongTypeService();
+			ISongTypeService its = ServiceFactory.getSongTypeServiceInstace();
 			switch(param) {
 				case "get":
 					get(its,req,res);
 					return;
 				case "add":
+				try {
 					add(its,req,res);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 					return;
 				case "delete":
+				try {
 					delete(its,req,res);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 					return;
 				case "update":
+				try {
 					update(its,req,res);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 					return;
 				default:
 					System.out.println("没有可执行的操作！");
@@ -47,7 +62,7 @@ public class TypeServlet extends HttpServlet {
 		req.getRequestDispatcher("/MusicBlog/WEB-INF/404.jsp").forward(req, res);
 	}
 
-	private void delete(ISongTypeService its, HttpServletRequest req, HttpServletResponse res) {
+	private void delete(ISongTypeService its, HttpServletRequest req, HttpServletResponse res) throws Exception {
 		String id = req.getParameter("id");
 		if(id != null && !"".equals(id) || id.length() > 0) {
 			SongType type = new SongType();
@@ -68,7 +83,7 @@ public class TypeServlet extends HttpServlet {
 		}
 	}
 
-	private void update(ISongTypeService its, HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	private void update(ISongTypeService its, HttpServletRequest req, HttpServletResponse res) throws Exception {
 		String id = req.getParameter("id");
 		String type = req.getParameter("type");
 		if(id != null && !"".equals(id.trim()) && type != null && !"".equals(type.trim())) {
@@ -94,7 +109,7 @@ public class TypeServlet extends HttpServlet {
 		}
 	}
 
-	private void add(ISongTypeService its, HttpServletRequest req, HttpServletResponse res) {
+	private void add(ISongTypeService its, HttpServletRequest req, HttpServletResponse res) throws Exception {
 		String type = req.getParameter("type");
 		if(type != null && !"".equals(type)) {
 			List<SongType> types = its.getAll();

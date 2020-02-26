@@ -14,50 +14,50 @@ import com.explorer.musicblog.dao.IUserDao;
 public class DaoFactory {
 
 	/**
-	 * 用户实例
+	 * 用户Dao实例
 	 * @return
 	 */
-	public static IUserDao getUserDao() {
+	public static IUserDao getUserDaoInstace() {
 		return new UserDaoImpl();
 	}
 	
 	/**
-	 * 歌曲类型实例
+	 * 歌曲类型Dao实例
 	 * @return
 	 */
-	public static ISongTypeDao getTypeDao() {
+	public static ISongTypeDao getTypeDaoInstace() {
 		return new SongTypeDaoImpl();
 	}
 	
 	/**
-	 * 歌手实例
+	 * 歌手Dao实例
 	 * @return
 	 */
-	public static ISingerDao getSingerDao() {
+	public static ISingerDao getSingerDaoInstace() {
 		return new SingerDaoImpl();
 	}
 	
 	/**
-	 * 歌曲实例
+	 * 歌曲Dao实例
 	 * @return
 	 */
-	public static ISongDao getSongDao() {
+	public static ISongDao getSongDaoInstace() {
 		return new SongDaoImpl();
 	}
 	
 	/**
-	 * 歌词实例
+	 * 歌词Dao实例
 	 * @return
 	 */
-	public static ILyricDao getLyricDao() {
+	public static ILyricDao getLyricDaoInstace() {
 		return new LyricDaoImpl();
 	}
 	
 	/**
-	 * 文章实例
+	 * 文章Dao实例
 	 * @return
 	 */
-	public static IArticleDao getArticleDao() {
+	public static IArticleDao getArticleDaoInstace() {
 		return new ArticleDaoImpl();
 	}
 	

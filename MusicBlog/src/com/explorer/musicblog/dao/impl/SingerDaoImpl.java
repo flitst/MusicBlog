@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.explorer.musicblog.dao.ISingerDao;
-import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.Singer;
 import com.explorer.musicblog.util.DBUtils;
 
@@ -28,29 +27,22 @@ public class SingerDaoImpl implements ISingerDao {
 	public Integer insert(Singer singer) {
 		String sql = "insert into `singer`(`name`,`sex`,`age`,`head`,`image`,`create_time`,`update_time`) values (?,?,?,?,?,?,?)";
 		try {
-			try {
-				conn = db.getConnection();
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (DBUtils.getDataBase() != null) {
+				ps = conn.prepareStatement(sql);
+				ps.setString(1, singer.getName());
+				ps.setObject(2, singer.getSex());
+				ps.setInt(3, singer.getAge());
+				ps.setString(4, singer.getHead());
+				ps.setString(5, singer.getImage());
+				ps.setString(6, singer.getCreateTime());
+				ps.setString(7, singer.getUpdateTime());
+				System.out.println(DBUtils.printSQL(ps,"新增歌手"));
 			}
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, singer.getName());
-			ps.setObject(2, singer.getSex());
-			ps.setInt(3, singer.getAge());
-			ps.setString(4, singer.getHead());
-			ps.setString(5, singer.getImage());
-			ps.setString(6, singer.getCreateTime());
-			ps.setString(7, singer.getUpdateTime());
-			System.out.println(db.printSQL(ps,"新增歌手"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
@@ -66,16 +58,12 @@ public class SingerDaoImpl implements ISingerDao {
 			}
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
-			System.out.println(db.printSQL(ps,"删除歌手"));
+			System.out.println(DBUtils.printSQL(ps,"删除歌手"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
@@ -97,16 +85,12 @@ public class SingerDaoImpl implements ISingerDao {
 			ps.setString(5, singer.getImage());
 			ps.setString(6, singer.getUpdateTime());
 			ps.setInt(7, singer.getId());
-			System.out.println(db.printSQL(ps,"修改歌手"));
+			System.out.println(DBUtils.printSQL(ps,"修改歌手"));
 			return ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return null;
 	}
@@ -122,7 +106,7 @@ public class SingerDaoImpl implements ISingerDao {
 				e.printStackTrace();
 			}
 			ps = conn.prepareStatement(sql);
-			System.out.println(db.printSQL(ps,"获取所有歌手"));
+			System.out.println(DBUtils.printSQL(ps,"获取所有歌手"));
 			rs = ps.executeQuery();
 			Singer singer = null;
 			singers = new ArrayList<Map<String,Singer>>();
@@ -143,11 +127,7 @@ public class SingerDaoImpl implements ISingerDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return singers;
 	}
@@ -165,7 +145,7 @@ public class SingerDaoImpl implements ISingerDao {
 			}
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, "%"+name+"%");
-			System.out.println(db.printSQL(ps,"根据歌手名获取歌手"));
+			System.out.println(DBUtils.printSQL(ps,"根据歌手名获取歌手"));
 			rs = ps.executeQuery();
 			singers = new ArrayList<Singer>();
 			while (rs.next()) {
@@ -183,11 +163,7 @@ public class SingerDaoImpl implements ISingerDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return singers;
 	}
@@ -204,7 +180,7 @@ public class SingerDaoImpl implements ISingerDao {
 			}
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
-			System.out.println(db.printSQL(ps,"根据歌手ID获取歌手"));
+			System.out.println(DBUtils.printSQL(ps,"根据歌手ID获取歌手"));
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				sin = new Singer();
@@ -219,11 +195,7 @@ public class SingerDaoImpl implements ISingerDao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				db.close(rs, ps, conn);
-			} catch (CustomException e) {
-				e.printStackTrace();
-			}
+			DBUtils.close(rs, ps, conn);
 		}
 		return sin;
 	}
@@ -253,20 +225,26 @@ public class SingerDaoImpl implements ISingerDao {
 	}
 
 	@Override
-	public Integer getSize() throws Exception {
+	public Integer getSize() {
 		String sql = "select count(*) from `singer`";
 		conn = db.getConnection();
-		ps = conn.prepareStatement(sql);
-		rs = ps.executeQuery();
 		Integer num = null;
-		while (rs.next()) {
-			num = rs.getInt(1);
+		try {
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				num = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtils.close(rs, ps, conn);
 		}
 		return num;
 	}
 
 	@Override
-	public List<Map<String, Object>> query(Class<Singer> clazz, String sql, Object... args) throws Exception {
+	public List<Map<String, Object>> query(Class<Singer> clazz, String sql, Object... args) {
 		// TODO Auto-generated method stub
 		return null;
 	}

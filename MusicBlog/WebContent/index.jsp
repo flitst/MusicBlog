@@ -1,20 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="com.explorer.musicblog.filter.WebsiteStatisticFilter" %>
-<%@ page import="com.explorer.musicblog.listener.OnlineNumberListener" %>
-<%@ page import="com.explorer.musicblog.servlet.CounterServlet" %>
-<%@ page import="com.explorer.musicblog.util.FileUtils" %>
-<%@ page import="com.explorer.musicblog.pojo.Song" %>
+<%@ page import="com.explorer.musicblog.listener.OnlineNumberListener.*" %>
+<%@ page import="com.explorer.musicblog.servlet.CounterServlet.*" %>
+<%@ page import="com.explorer.musicblog.util.FileUtils"%>
+<%@ page import="com.explorer.musicblog.pojo.Song.*" %>
 <%@ page import="java.io.FileOutputStream"%>
 <%@ page import="java.io.FileInputStream"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.io.File" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 	<head>
-		<!-- <meta  http-equiv="refresh"  content="15">  -->
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<!-- <meta http-equiv="refresh"  content="15"> -->
 		<title>音乐盒子</title>
 		<style type="text/css">
 			body{
@@ -140,30 +140,11 @@
 				</form>
 			</div>
 		</div>
+		
+		<%-- <% response.setHeader("refresh","3");%> --%>
+		
 		<div id="header">
-			<c:choose>
-				<c:when test="${applicationScope.count == null || applicationScope.count == 0}">
-					<c:set scope="application" var="count">
-						${count+=1}
-					</c:set>
-				</c:when>
-				<c:otherwise>
-						<c:if test="${applicationScope.count == 0}">
-							<c:set scope="application" var="count" value="${count = CounterServlet.readFile(\"D:/Java/Tomcat/apache-tomcat-9.0.0.M26/count.txt\")}">
-									<c:if test="${count == 0}">
-										<c:set scope="application" var="count">
-											${count = 1}
-										</c:set>
-									</c:if>
-							</c:set>
-						</c:if>
-						<c:if test="${session.isNew()}">
-							<c:set scope="application" var="count">${count+=1}</c:set>
-						</c:if>
-				</c:otherwise>
-			</c:choose>
-			<b> 站点访问次数: ${applicationScope.count}</b> | 
-			<b> 在线人数: ${applicationScope.userNum}</b> | 
+			<b> 站点访问次数: ${count}</b> | <b> 在线人数: ${userNum}</b> | 
 			<c:choose>
 				<c:when test="${sessionScope.user != null}">
 					欢迎你：<a id="user" href="javascript:void(0);" onclick="getUser()">${user.getAccount()}</a>

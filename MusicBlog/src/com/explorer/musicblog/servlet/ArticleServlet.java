@@ -18,11 +18,11 @@ public class ArticleServlet extends BaseServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	IArticleService service = ServiceFactory.getArticleService();
+	IArticleService service = ServiceFactory.getArticleServiceInstace();
 	
 	public ArticleServlet() {}
 	
-	public void pushArticle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void pushArticle(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String id = req.getParameter("id");
 		String title = req.getParameter("title");
 		String reference = req.getParameter("reference");
@@ -61,7 +61,7 @@ public class ArticleServlet extends BaseServlet {
 		req.getRequestDispatcher("/WEB-INF/404.jsp").forward(req, resp);
 	}
 	
-	public void getAll(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
+	public void getAll(HttpServletRequest req, HttpServletResponse res) throws Exception{
 		List<Article> articles = service.getAll();
 		req.setAttribute("msg", "获取所有文章");
 		req.setAttribute("title", "获取所有文章");
@@ -75,8 +75,8 @@ public class ArticleServlet extends BaseServlet {
 		}
 	}
 	
-	private void manager(HttpServletRequest req, HttpServletResponse resp){
-		IArticleService articleService = ServiceFactory.getArticleService();
+	private void manager(HttpServletRequest req, HttpServletResponse resp) throws Exception{
+		IArticleService articleService = ServiceFactory.getArticleServiceInstace();
 		List<Article> all = articleService.getAll();
 		req.setAttribute("msg", "管理文章");
 		req.setAttribute("articles", all);

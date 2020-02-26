@@ -31,7 +31,7 @@ public class SingerServlet extends HttpServlet {
 		String control = req.getParameter("singer");
 		if(control != null && !"".equals(control.trim()) && control.length() > 0) {
 			System.out.println("control:"+control);
-			ISingerService iss = ServiceFactory.getSingerService();
+			ISingerService iss = ServiceFactory.getSingerServiceInstace();
 			switch(control) {
 				case "name":
 					getByName(iss,req,resp);

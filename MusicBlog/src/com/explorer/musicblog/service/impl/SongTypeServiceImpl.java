@@ -15,31 +15,31 @@ import com.explorer.musicblog.service.ISongTypeService;
  */
 public class SongTypeServiceImpl implements ISongTypeService {
 
-	private ISongTypeDao songTypeDao  = DaoFactory.getTypeDao();
+	private ISongTypeDao songTypeDao  = DaoFactory.getTypeDaoInstace();
 
 	@Override
-	public List<SongType> getByName(String name) {
+	public List<SongType> getByName(String name) throws Exception {
 		return songTypeDao.getByName(name);
 	}
 	
 
 	@Override
-	public List<SongType> getAll() {
+	public List<SongType> getAll() throws Exception {
 		return songTypeDao .getAll();
 	}
 
 	@Override
-	public Integer insert(SongType type) {
+	public Integer insert(SongType type) throws Exception {
 		return songTypeDao .insert(type);
 	}
 
 	@Override
-	public Integer update(SongType type) {
+	public Integer update(SongType type) throws Exception {
 		return songTypeDao .update(type);
 	}
 
 	@Override
-	public Integer delete(SongType type) {
+	public Integer delete(SongType type) throws Exception {
 		return songTypeDao .delete(type);
 	}
 

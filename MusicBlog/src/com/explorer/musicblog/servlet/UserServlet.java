@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,66 +17,65 @@ import javax.servlet.http.HttpServletResponse;
 import com.explorer.musicblog.exception.CustomException;
 import com.explorer.musicblog.pojo.User;
 import com.explorer.musicblog.service.IUserService;
+import com.explorer.musicblog.service.impl.ServiceFactory;
 import com.explorer.musicblog.service.impl.UserServiceImpl;
 import com.explorer.musicblog.util.StringUtils;
 
 /**
  * 	UserServlet
- * 	用户
+ * 	用户类Servlet
  */
 @WebServlet(urlPatterns = "/UserServlet.do")
 public class UserServlet extends BaseServlet {
 	
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 用户登录
+	 * @param req
+	 * @param resp
+	 * @throws Exception
+	 */
 	public void login(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		// 获取登录参数
 		String account = req.getParameter("account");
 		String pwd = req.getParameter("pwd");
 		String piccode = req.getParameter("piccode");
-		String ukey = (String)req.getSession().getAttribute("ukey");
-		String k = (String)ukey;
-		Object obj = req.getSession().getAttribute(k);
 		String rememberMe = req.getParameter("rememberMe");
-		System.out.println("rememberMe:"+rememberMe);
+		
+		// 获取用户cookie
 		Cookie[] cookies = req.getCookies();
-		if (obj != null && obj instanceof User || cookies != null && cookies.length > 0 && rememberMe != null && rememberMe.equals("on")) {
-			boolean bool = rememberMe(account, pwd, rememberMe, cookies,req, resp);
-			if (bool) {
-				req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
+		
+		// 创建用户Service对象
+		IUserService ius = ServiceFactory.getUserServiceInstace();
+		
+		// 判断用户是否选择“记住我”
+		if (cookies != null && cookies.length > 0) {
+			
+			// 验证cookie
+			Map<String, String> map = rememberMe(account, pwd, rememberMe, cookies,req, resp);
+			if (map != null && map.size() > 0) {
+				account = map.get("account");
+				pwd = map.get("pwd");
+				
+				// 跳转的用户主页
+				goToMain(ius, account, pwd, req, resp);
 				return;
 			}
 		}
+		
 		// 验证账号和密码
 		if (StringUtils.isNotBlank(account) && StringUtils.isNotBlank(pwd)){
 			Object code = req.getSession().getAttribute("code");
+			
 			// 验证用户输入的验证码
 			if (StringUtils.isNotBlank(piccode) && code instanceof String && piccode.equalsIgnoreCase((String)code)) {
 				// 验证完毕立即销毁此次验证码，以防下次登录时验证的还是之前的验证码
 				req.getSession().removeAttribute("code");
-				IUserService ius = new UserServiceImpl();
-				List<User> users = ius.getByName(account);
-				for (User u : users) {
-					if (u != null && u.getStatus() == 1) {
-						u = ius.login(account,pwd);
-						if (u != null && u.getId() != null) {
-							System.out.println("登录成功! 欢迎您:"+u.getAccount());
-							req.setAttribute("msg", "登录成功! 欢迎您:"+u.getAccount());
-			//				String key = u.getId()+u.getAccount();
-			//				req.getSession().setAttribute(key, u);
-			//				req.getSession().setAttribute("ukey", key);
-							req.getSession().setAttribute("title", "我的主页");
-							req.getSession().setAttribute("user", u);
-							req.getRequestDispatcher("/WEB-INF/user/Main.jsp").forward(req, resp);
-							return;
-						} else {
-							System.out.println("用户名或密码错误!");
-							req.setAttribute("error_msg", "用户名或密码错误!");
-						}
-					} else {
-						req.setAttribute("error_msg", "此账号已被禁用！若用疑问请<a href=\"RootControlServlet.do?params=contact\">联系站长<a>");
-						System.out.println("此账号已被禁用！");
-					}
-				}
+				
+				// 跳转的用户主页
+				goToMain(ius, account, pwd, req, resp);
+				return;
 			} else {
 				req.setAttribute("error_msg", "验证码无效！");
 			}
@@ -85,40 +86,81 @@ public class UserServlet extends BaseServlet {
 		req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
 	}
 
-	private boolean rememberMe(String account,String pwd,String rememberMe,Cookie[] cookies, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		if (account != null && !"".equals(account) && pwd != null && !"".equals(pwd)) {
-			if (cookies != null && cookies.length > 0) {
-				for (Cookie cookie : cookies) {
-					if (cookie.getName().equals(account) && cookie.getValue().equals(pwd)) {
-						User user = new User();
-						user.setAccount(cookie.getName());
-						user.setPwd(cookie.getValue());
-						req.getSession().setAttribute("account", account);
-						req.getSession().setAttribute("pwd", pwd);
-						return true;
-					}
+	private void goToMain(IUserService ius, String account,String pwd, HttpServletRequest req, HttpServletResponse resp) throws CustomException, Exception {
+//		String ukey = (String)req.getSession().getAttribute("ukey");
+//		String k = (String)ukey;
+//		Object obj = req.getSession().getAttribute(k);
+		
+		// 验证账号是否存在
+		User user = ius.getByUserName(account);
+		if (user != null) {
+			
+			// 验证用户是否禁用
+			if (user != null && user.getStatus() == 1) { // obj != null && obj instanceof User || 
+				user = ius.login(account,pwd);
+				if (user != null && user.getId() != null) {
+					req.setAttribute("msg", "登录成功! 欢迎您:"+user.getAccount());
+//					String key = u.getId()+u.getAccount();
+//					req.getSession().setAttribute(key, u);
+//					req.getSession().setAttribute("ukey", key);
+					req.getSession().setAttribute("title", "我的主页");
+					req.getSession().setAttribute("user", user);
+					req.getRequestDispatcher("/WEB-INF/user/Main.jsp").forward(req, resp);
+					return;
+				} else {
+					req.setAttribute("error_msg", "用户名或密码错误!");
+					System.out.println("用户名或密码错误!");
 				}
-			} else {
+			} else if (user.getStatus() == 1){
+				req.setAttribute("error_msg", "此账号已被禁用！若有疑问请<a href=\"RootControlServlet.do?params=contact\">联系站长<a>");
+				System.out.println("此账号已被禁用！");
+			}
+		}
+		req.setAttribute("error_msg", "此用户不存在!");
+		req.getRequestDispatcher("/WEB-INF/user/Login.jsp").forward(req, resp);
+		System.out.println("此用户不存在!");
+	}
+	
+	/**
+	 * 记住我功能
+	 * @param account
+	 * @param pwd
+	 * @param rememberMe
+	 * @param cookies
+	 * @param req
+	 * @param resp
+	 * @return
+	 * @throws Exception
+	 */
+	private Map<String, String> rememberMe(String account,String pwd,String rememberMe,Cookie[] cookies, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		HashMap<String, String> map = new HashMap<>();
+		if (rememberMe != null && "on".equals(rememberMe) && StringUtils.isNotBlank(account) && StringUtils.isNotBlank(pwd)) {
+			boolean bool = true;
+			for (Cookie cookie : cookies) {
+				System.out.println("cookie.getName():"+cookie.getName());
+				System.out.println("cookie.getValue():"+cookie.getValue());
+				if ("account".equals(cookie.getName()) && cookie.getValue().equals(account) && "pwd".equals(cookie.getName()) && cookie.getValue().equals(pwd)) {
+					map.put("account",account);
+					map.put("pwd",pwd);
+					bool = false;
+				}
+			}
+			if (bool) {
 				Cookie username = new Cookie("account", account);
 				Cookie pass = new Cookie("pwd", pwd);
-				username.setPath(req.getContextPath() + "/user");
-				pass.setPath(req.getContextPath() + "/user");
-				if (rememberMe != null && rememberMe.equals("on")) {
-					username.setMaxAge(60 * 60 * 24 * 3);// 三天
-					pass.setMaxAge(60 * 60 * 24 * 3);// 三天
-				} else {
-					username.setMaxAge(0);
-					pass.setMaxAge(0);
-				}
+//				username.setPath(req.getContextPath() + "/user");
+//				pass.setPath(req.getContextPath() + "/user");
+				username.setMaxAge(60 * 60 * 24 * 3);// 三天
+				pass.setMaxAge(60 * 60 * 24 * 3);// 三天
 				resp.addCookie(username);
 				resp.addCookie(pass);
 			}
 		}
-		return false;
+		return map;
 	}
 	
 	/**
-	 * 	退出登录
+	 * 退出登录
 	 * @param user
 	 * @param req
 	 * @param resp
@@ -149,6 +191,13 @@ public class UserServlet extends BaseServlet {
 		req.getRequestDispatcher("/WEB-INF/user/Main.jsp").forward(req, resp);
 	}
 	
+	/**
+	 * 用户注册
+	 * @param ius
+	 * @param req
+	 * @param resp
+	 * @throws Exception
+	 */
 	public void register(IUserService ius,HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String account = req.getParameter("account");
 		String pwd = req.getParameter("pwd");
@@ -196,6 +245,16 @@ public class UserServlet extends BaseServlet {
 		}
 	}
 	
+	/**
+	 * 验证账号
+	 * @param user
+	 * @param iu
+	 * @param account
+	 * @param req
+	 * @param resp
+	 * @return
+	 * @throws Exception
+	 */
 	private boolean checkAccount(User user,IUserService iu,String account, HttpServletRequest req, HttpServletResponse resp) throws Exception{
 		PrintWriter out = resp.getWriter();
 		user.setAccount(account);
@@ -213,20 +272,37 @@ public class UserServlet extends BaseServlet {
 		}
 	}
 
+	/**
+	 * 修改密码
+	 * @param ius
+	 * @param req
+	 * @param resp
+	 */
 	public void updatePWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
 		String no = req.getParameter("no");
 		if(no != null && !"".equals(no)) {
 			System.out.println("no:"+no);
 			User u = new User();
-			ius.update(u);
+			try {
+				ius.update(u);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
+	/**
+	 * 忘记密码
+	 * @param ius
+	 * @param req
+	 * @param resp
+	 */
 	public void forgetPWD(IUserService ius, HttpServletRequest req, HttpServletResponse resp) {
 	}
 	
 	/**
-	 * 获取所有用户
+	 * 管理所有用户
 	 * @param us
 	 * @param req
 	 * @param resp
@@ -243,6 +319,14 @@ public class UserServlet extends BaseServlet {
 		}
 	}
 	
+	/**
+	 * 修改用户信息
+	 * @param ius
+	 * @param req
+	 * @param resp
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	public void update(IUserService ius, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String oldPwd = req.getParameter("old");
 		String newPwd = req.getParameter("new");
@@ -352,7 +436,7 @@ public class UserServlet extends BaseServlet {
 	}
 	
 	/**
-	 * 禁用用户
+	 * 启用用户
 	 * @param us
 	 * @param req
 	 */
@@ -414,5 +498,4 @@ public class UserServlet extends BaseServlet {
 			}
 		}
 	}
-	
 }

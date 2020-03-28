@@ -1,8 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="com.explorer.musicblog.filter.WebsiteStatisticFilter" %>
-<%@ page import="com.explorer.musicblog.listener.OnlineNumberListener" %>
-<%@ page import="com.explorer.musicblog.servlet.CounterServlet" %>
 <%@ page import="com.explorer.musicblog.util.FileUtils" %>
 <%@ page import="com.explorer.musicblog.pojo.Song" %>
 <%@ page import="java.io.FileOutputStream"%>
